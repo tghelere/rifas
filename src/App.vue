@@ -1,36 +1,41 @@
 <template>
-    <div :class="['container']">
+    <div :class="['container', 'py-2']">
         <div class="my-3 text-center">
-            <h2 class="fw-bold mb-0 text-primary-emphasis">Sorteio de números disponíveis</h2>
+            <h2 class="fw-semi-bold mb-0 text-light titulo">Sorteio de números disponíveis</h2>
         </div>
 
-        <div class="card bg-light border-1 mb-4">
+        <div class="card bg-transparent border-warning rounded-0 border-1 mb-5">
             <div class="card-body">
-                <label for="texto" class="form-label fw-bold">Cole o texto com os números</label>
-                <textarea v-model="texto" id="texto" class="form-control" rows="6" required></textarea>
+                <label for="texto" class="form-label fw-bold text-light">Cole o texto com os números</label>
+                <textarea v-model="texto" id="texto" class="form-control rounded-0" rows="6" required placeholder="Cole o texto aqui"></textarea>
             </div>
-            <div class="card-footer bg-light d-flex justify-content-center gap-2 border-1">
-                <button type="button" class="btn btn-outline-warning d-flex align-items-center gap-2" @click="colarTexto"><i class="bi bi-clipboard"></i> Colar</button>
-                <button type="button" class="btn btn-outline-primary d-flex align-items-center gap-2" @click="executar"><i class="bi bi-search"></i> Buscar</button>
-                <button type="button" class="btn btn-outline-danger d-flex align-items-center gap-2" @click="limparTudo"><i class="bi bi-trash"></i> Limpar</button>
+            <div class="card-footer d-flex justify-content-center gap-2 border-warning rounded-0 border-1">
+                <button type="button" class="btn btn-warning d-flex align-items-center gap-2 px-5" @click="colarTexto"><i class="bi bi-clipboard"></i> Colar</button>
+                <button type="button" class="btn btn-primary d-flex align-items-center gap-2 px-5" @click="executar"><i class="bi bi-search"></i> Buscar</button>
+                <button type="button" class="btn btn-danger d-flex align-items-center gap-2 px-5" @click="limparTudo"><i class="bi bi-trash"></i> Limpar</button>
             </div>
         </div>
 
-        <div v-if="numerosDisponiveis.length" class="card bg-light border-1 mb-4">
-            <div class="card-body">
+        <div v-if="numerosDisponiveis.length" class="card bg-transparent border-warning rounded-0 border-1 mb-5">
+            <div class="card-body text-light">
                 <label class="form-label fw-bold">
                     Números disponíveis <span class="badge text-bg-primary p-2">{{ numerosDisponiveis.length }}</span>
                 </label>
-                <p class="text-muted">{{ numerosDisponiveis.join(', ') }}</p>
+                <div class="border p-4 escuro border-warning w-100 text-center">
+                    <p class="text-warning">{{ numerosDisponiveis.join(', ') }}</p>
+                    <div class="mx-auto w-100">
+                        <button class="btn btn-info mt-2" @click="copiarNumeros(numerosDisponiveis)"><i class="bi bi-files"></i> Copiar números disponíveis</button>
+                    </div>
+                </div>
                 <div class="row g-3 mt-3">
                     <div class="col-md-6">
                         <label for="qtd" class="form-label">Quantidade a sortear:</label>
                         <div class="input-group">
-                            <button class="btn btn-outline-danger" type="button" @click="decrementarQuantidade">
+                            <button class="btn btn-danger" type="button" @click="decrementarQuantidade">
                                 <i class="bi bi-dash-circle"></i>
                             </button>
                             <input id="qtd" type="number" class="form-control text-center" v-model.number="quantidadeGerar" :min="1" :max="numerosDisponiveis.length" />
-                            <button class="btn btn-outline-success" type="button" @click="incrementarQuantidade">
+                            <button class="btn btn-success" type="button" @click="incrementarQuantidade">
                                 <i class="bi bi-plus-circle"></i>
                             </button>
                         </div>
@@ -38,21 +43,21 @@
                     </div>
                     <div class="col-md-6">
                         <label for="" class="form-label d-none d-md-block">&nbsp;</label>
-                        <button class="btn btn-outline-primary w-100" @click="gerarAleatorios" :disabled="!!erroValidacao">
-                            <i class="bi bi-shuffle"></i> Sortear
-                        </button>
+                        <button class="btn btn-primary w-100" @click="gerarAleatorios" :disabled="!!erroValidacao"><i class="bi bi-shuffle"></i> Sortear</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="historico.length" class="card bg-body-tertiary border-1 mb-4 fade-in">
+        <div v-if="historico.length" class="card bg-transparent rounded-0 border-warning border-1 mb-5 fade-in">
             <div class="card-body">
-                <label for="texto" class="form-label fw-bold">Números sorteados</label>
+                <label for="texto" class="form-label fw-bold text-light">Números sorteados</label>
                 <div class="d-flex flex-wrap gap-4">
-                    <div v-for="(grupo, index) in historico" :key="index" class="border rounded p-4 bg-white mx-auto d-grid w-100">
-                        <div class="text-muted text-center fs-5">{{ grupo.join(', ') }}</div>
-                        <button class="btn btn-sm btn-outline-primary mt-2" @click="copiarGrupo(grupo)"><i class="bi bi-files"></i> Copiar números</button>
+                    <div v-for="(grupo, index) in historico" :key="index" class="border p-4 escuro border-warning mx-auto w-100 text-center">
+                        <div class="text-light fs-5">{{ grupo.join(', ') }}</div>
+                        <div class="mx-auto w-100">
+                            <button class="btn btn-info mt-2" @click="copiarNumeros(grupo)"><i class="bi bi-files"></i> Copiar números sorteados</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,9 +125,9 @@ async function colarTexto() {
     }
 }
 
-function copiarGrupo(grupo) {
+function copiarNumeros(numeros) {
     navigator.clipboard
-        .writeText(grupo.join(', '))
+        .writeText(numeros.join(', '))
         .then(() => {
             mostrarToast('Números copiados.')
         })
@@ -149,9 +154,34 @@ function decrementarQuantidade() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 textarea {
     resize: vertical;
+    background-color: #4e1a0e98;
+    color: #fff;
+    &::placeholder {
+        font-weight: bold;
+        text-align: center;
+        font-size: 1.8rem;
+        opacity: 0.3;
+        color: rgb(255, 77, 0);
+        text-transform: uppercase;
+        font-style: italic;
+    }
+    &:focus {
+        background-color: #4e1a0ecd;
+    }
+}
+.card-body,
+.card-footer {
+    background-color: #4e1a0e98;
+}
+.escuro {
+    background-color: #4e1a0ecd;
+}
+.titulo {
+    text-shadow: 1px 1px 1px #ce9253;
+    font-size: 2.5em;
 }
 .toast-custom {
     transition: opacity 0.5s ease;
