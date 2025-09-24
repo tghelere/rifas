@@ -2,7 +2,10 @@
     <header class="container">
         <div class="card border-1 mb-3 topo">
             <div class="py-3 text-center card-body">
-                <h1 class="fw-semi-bold mb-0 text-dark">Sorteador de rifas</h1>
+                <h1 class="fw-semi-bold mb-0 text-dark d-flex justify-content-center align-items-center gap-2">
+                    <img src="/apple-touch-icon.png" alt="Logo" style="height: 40px; width: auto" />
+                    Sorteador de rifas
+                </h1>
             </div>
         </div>
     </header>
