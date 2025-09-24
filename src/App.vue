@@ -1,15 +1,18 @@
 <template>
-    <div :class="['container', 'py-2']">
-        <div class="my-3 text-center">
-            <h2 class="fw-semi-bold mb-0 text-light titulo">Sorteio de números disponíveis</h2>
-        </div>
-
-        <div class="card bg-transparent border-warning rounded-0 border-1 mb-5">
-            <div class="card-body">
-                <label for="texto" class="form-label fw-bold text-light">Cole o texto com os números</label>
-                <textarea v-model="texto" id="texto" class="form-control rounded-0" rows="6" required placeholder="Cole o texto aqui"></textarea>
+    <header class="container">
+        <div class="card border-1 mb-3 topo">
+            <div class="py-3 text-center card-body">
+                <h1 class="fw-semi-bold mb-0 text-dark">Sorteador de rifas</h1>
             </div>
-            <div class="card-footer border-warning rounded-0 border-1">
+        </div>
+    </header>
+    <div :class="['container', 'main']">
+        <div class="card border-1 mb-3">
+            <div class="card-body">
+                <label for="texto" class="form-label fw-bold text-dark">Cole o texto com os números</label>
+                <textarea v-model="texto" id="texto" class="form-control" rows="6" required placeholder="Cole o texto aqui"></textarea>
+            </div>
+            <div class="card-footer border-1">
                 <div class="row g-2">
                     <div class="col-12 col-md-auto flex-grow-1">
                         <button type="button" class="btn btn-warning w-100 d-flex justify-content-center align-items-center gap-2" @click="colarTexto"><i class="bi bi-clipboard"></i> Colar</button>
@@ -25,12 +28,12 @@
         </div>
 
         <transition name="slide-fade">
-            <div v-if="numerosDisponiveis.length" class="card bg-transparent border-warning rounded-0 border-1 mb-5" ref="disponiveisRef">
-                <div class="card-body text-light">
+            <div v-if="numerosDisponiveis.length" class="card border-1 mb-3" ref="disponiveisRef">
+                <div class="card-body text-dark">
                     <label class="form-label fw-bold">
                         Números disponíveis <span class="badge text-bg-primary p-2">{{ numerosDisponiveis.length }}</span>
                     </label>
-                    <div class="border p-4 escuro border-warning w-100 text-center">
+                    <div class="border p-4 w-100 text-center">
                         <p class="text-warning">{{ numerosDisponiveis.join(', ') }}</p>
                         <div class="mx-auto w-100">
                             <button class="btn btn-info mt-2" @click="copiarNumeros(numerosDisponiveis)"><i class="bi bi-files"></i> Copiar números disponíveis</button>
@@ -60,12 +63,12 @@
         </transition>
 
         <transition name="slide-fade">
-            <div v-if="historico.length" class="card bg-transparent rounded-0 border-warning border-1 mb-5 fade-in" ref="historicoRef">
+            <div v-if="historico.length" class="card border-1 mb-3 fade-in" ref="historicoRef">
                 <div class="card-body">
-                    <label class="form-label fw-bold text-light">Números sorteados</label>
+                    <label class="form-label fw-bold text-dark">Números sorteados</label>
                     <div class="d-grid gap-4">
-                        <div v-for="item in historico" :key="item.chave" class="border p-4 escuro border-warning mx-auto w-100 text-center" :class="{ destaque: item.chave === ultimoGrupoAnimado }">
-                            <div class="text-light fs-5">{{ item.grupo.join(', ') }}</div>
+                        <div v-for="item in historico" :key="item.chave" class="border p-4 mx-auto w-100 text-center" :class="{ destaque: item.chave === ultimoGrupoAnimado }">
+                            <div class="text-dark fs-5">{{ item.grupo.join(', ') }}</div>
                             <div class="text-secondary small">{{ item.dataHora }}</div>
                             <div class="mx-auto w-100">
                                 <button class="btn btn-info mt-2" @click="copiarNumeros(item.grupo)"><i class="bi bi-files"></i> Copiar números sorteados</button>
@@ -80,12 +83,17 @@
             <div class="alert alert-info py-2 px-3 shadow-sm mb-0">{{ toast }}</div>
         </div>
     </div>
+    <footer class="bg-black mt-auto py-3">
+        <div class="container text-center text-light italic">
+            <small>Developed with <i class="bi bi-heart-fill text-danger"></i> by <a href="https://www.linkedin.com/in/ghelere/" target="_blank">TGhelere</a> for you</small>
+        </div>
+    </footer>
 </template>
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
 
-document.title = 'Sorteio de números disponíveis'
+document.title = 'Sorteador de rifas'
 
 const texto = ref('')
 const numerosDisponiveis = ref([])
@@ -196,34 +204,29 @@ function decrementarQuantidade() {
 </script>
 
 <style scoped lang="scss">
+.main {
+    flex: 1;
+}
+.form-control:focus {
+    border-color: inherit;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.card.topo {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
 textarea {
     resize: vertical;
-    background-color: #4e1a0e98;
-    color: #fff;
     &::placeholder {
+        padding-top: 50px;
         font-weight: bold;
         text-align: center;
-        font-size: 1.8rem;
-        opacity: 0.3;
-        color: rgb(255, 77, 0);
-        text-transform: uppercase;
-        font-style: italic;
-    }
-    &:focus {
-        background-color: #4e1a0ecd;
-        color: #fff;
+        color: #b4b4b4;
     }
 }
-.card-body,
-.card-footer {
-    background-color: #4e1a0e98;
-}
-.escuro {
-    background-color: #4e1a0ecd;
-}
-.titulo {
-    text-shadow: 1px 1px 1px #ce9253;
-    font-size: 2.5em;
+header h1 {
+    font-size: 2em;
 }
 .toast-custom {
     transition: opacity 0.5s ease;
@@ -232,7 +235,6 @@ textarea {
 .slide-fade-enter-active {
     animation: fadeSlideIn 0.6s ease;
 }
-
 input[type='number'] {
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
@@ -253,7 +255,7 @@ input[type='number'] {
     }
 }
 .fade-in {
-    animation: fadeIn 0.4s ease-in-out;
+    animation: fadeIn 0.6s ease-in-out;
 }
 @keyframes fadeIn {
     from {
@@ -266,10 +268,10 @@ input[type='number'] {
     }
 }
 .destaque {
-    animation: desliza-destaque 0.6s ease;
-    background-color: #2e0a02c4 !important;
+    border-color: #6f6f8f !important;
+    background-color: aliceblue;
+    animation: desliza-destaque 1s ease;
 }
-
 @keyframes desliza-destaque {
     from {
         opacity: 0;
