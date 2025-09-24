@@ -31,6 +31,27 @@
         </div>
 
         <transition name="slide-fade">
+            <div v-if="numerosDisponiveis.length" class="card border-1 mb-3 py-4">
+                <h5 class="text-muted text-center">
+                    <i class="bi bi-currency-dollar text-success" />
+                    <small><em>Anuncie seus produtos ou serviços aqui!</em></small>
+                    <i class="bi bi-currency-dollar text-success" />
+                </h5>
+                <div class="mx-auto w-100 text-center">
+                    <a
+                        class="btn btn-success mt-2"
+                        href="https://wa.me/5543991312016?text=Gostaria%20de%20anunciar%20meu%20produto%20ou%20servi%C3%A7o%20no%20Sorteador%20de%20Rifas"
+                        target="_blank"
+                        title="Entrar em contato pelo WhatsApp"
+                    >
+                        <i class="bi bi-whatsapp"></i>
+                        Contato
+                    </a>
+                </div>
+            </div>
+        </transition>
+
+        <transition name="slide-fade">
             <div v-if="numerosDisponiveis.length" class="card border-1 mb-3" ref="disponiveisRef">
                 <div class="card-body text-dark">
                     <label class="form-label fw-bold">
@@ -88,7 +109,10 @@
     </div>
     <footer class="bg-black mt-auto py-3">
         <div class="container text-center text-light italic">
-            <small>Developed with <i class="bi bi-heart-fill text-danger"></i> by <a href="https://www.linkedin.com/in/ghelere/" target="_blank">TGhelere</a> for you</small>
+            <small>
+                Developed with <i class="bi bi-heart-fill text-danger"></i> by
+                <a href="https://www.linkedin.com/in/ghelere/" title="Desenvolvedor Thyago Ghelere - LinkedIn" target="_blank">TGhelere</a> for you
+            </small>
         </div>
     </footer>
 </template>
