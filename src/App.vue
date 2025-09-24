@@ -31,22 +31,25 @@
         </div>
 
         <transition name="slide-fade">
-            <div v-if="numerosDisponiveis.length" class="card border-1 mb-3 py-4">
-                <h5 class="text-muted text-center">
-                    <i class="bi bi-currency-dollar text-success" />
-                    <small><em>Anuncie seus produtos ou serviços aqui!</em></small>
-                    <i class="bi bi-currency-dollar text-success" />
-                </h5>
-                <div class="mx-auto w-100 text-center">
-                    <a
-                        class="btn btn-success mt-2"
-                        href="https://wa.me/5543991312016?text=Gostaria%20de%20anunciar%20meu%20produto%20ou%20servi%C3%A7o%20no%20Sorteador%20de%20Rifas"
-                        target="_blank"
-                        title="Entrar em contato pelo WhatsApp"
-                    >
-                        <i class="bi bi-whatsapp"></i>
-                        Contato
-                    </a>
+            <div v-if="numerosDisponiveis.length" class="card anunciar border-1 mb-3 py-4 bg-secondary">
+                <div class="card-body">
+                    <h5 class="text-muted text-center">
+                        <i class="bi bi-currency-dollar text-success" />
+                        <small><em>Anuncie seus produtos ou serviços aqui!</em></small>
+                        <i class="bi bi-currency-dollar text-success" />
+                    </h5>
+                    <div class="row g-2 mt-2 justify-content-center">
+                        <div class="col-12 col-md-2">
+                            <a class="btn btn-sm btn-success w-100 d-flex justify-content-center align-items-center gap-2" :href="linkWhats" target="_blank" title="Entrar em contato pelo WhatsApp">
+                                <i class="bi bi-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <a class="btn btn-sm btn-dark w-100 d-flex justify-content-center align-items-center gap-2" :href="linkEmail" target="_blank" title="Entrar em contato por e-mail">
+                                <i class="bi bi-envelope-at text-light"></i> E-mail
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </transition>
@@ -130,6 +133,12 @@ const ultimoGrupoAnimado = ref(null)
 const toast = ref('')
 const disponiveisRef = ref(null)
 const historicoRef = ref(null)
+const numeroWhats = '5543991312016' // seu número em formato internacional
+const enderecoEmail = 'thng@outlook.com'
+const assuntoEmail = encodeURIComponent('Anúncio no Sorteador de Rifas')
+const mensagem = encodeURIComponent('Gostaria de anunciar meu produto ou serviço no Sorteador de Rifas.')
+const linkWhats = `https://wa.me/${numeroWhats}?text=${mensagem}`
+const linkEmail = `mailto:${enderecoEmail}?subject=${assuntoEmail}&body=${mensagem}`
 
 const erroValidacao = computed(() => {
     if (quantidadeGerar.value < 1) return 'A quantidade mínima é 1.'
@@ -254,6 +263,9 @@ textarea {
 }
 header h1 {
     font-size: 2em;
+}
+.card.anunciar h5{
+    font-size: 1em;
 }
 .toast-custom {
     transition: opacity 0.5s ease;
