@@ -1,35 +1,95 @@
-# rifa
+# 🎲 Sorteador de Rifas
 
-This template should help get you started developing with Vue 3 in Vite.
+Um aplicativo web moderno e elegante para gerenciar, rastrear e sortear números em rifas. Perfeito para organizadores de eventos, loterias e sorteios que desejam automatizar o processo de seleção aleatória.
 
-## Recommended IDE Setup
+## ✨ Funcionalidades
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### 📋 Gerenciamento de Números
+- **Buscar Números Disponíveis**: Identifique rapidamente quais números ainda não foram comprados
+- **Rastrear Não Pagos**: Visualize e agrupe todos os números de compradores que ainda não realizaram pagamento
+- **Visualização Compacta**: Interface intuitiva que exibe os dados de forma clara e organizada
 
-## Customize configuration
+### 🎯 Sorteio Inteligente
+- **Sorteio Aleatório**: Gere sorteios de 1 a N números de forma totalmente aleatória
+- **Controle de Quantidade**: Ajuste facilmente a quantidade de números a serem sorteados
+- **Histórico Completo**: Mantenha um registro de todos os sorteios realizados com data e hora
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### 📱 Experiência do Usuário
+- **Design Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
+- **Interface Intuitiva**: Botões claros e bem organizados para máxima produtividade
+- **Notificações em Tempo Real**: Receba feedback imediato das suas ações
+- **Copiar para Área de Transferência**: Compartilhe dados facilmente com um clique
 
-## Project Setup
+### 📊 Rastreamento de Dados
+- **Google Analytics**: Monitore o uso da aplicação e entenda o comportamento dos usuários
+- **Proteção contra Bloqueadores**: Funciona mesmo com adblockers habilitados
 
-```sh
-npm install
+### Formato de Entrada Esperado
+
+A aplicação trabalha com um formato de texto específico para processar os dados:
+
+```
+1- João Silva 💰
+2- Maria Santos 💸
+3- Pedro Oliveira
+4- 
+5- Ana Costa 💰
 ```
 
-### Compile and Hot-Reload for Development
+**Símbolos:**
+- `💰` ou `💸` = Número **pago**
+- Sem símbolo = Número **não pago**
+- Linha em branco (apenas número e hífen) = Número **disponível/não vendido**
 
-```sh
+## ⚙️ Configuração
+
+### Requisitos
+- Node.js 16+
+- npm ou yarn
+
+### Instalação
+
+```bash
+# Clonar o repositório
+git clone <seu-repositorio>
+cd rifa
+
+# Instalar dependências
+npm install
+
+# Criar arquivo .env baseado no exemplo
+cp .env.example .env
+```
+
+### Variáveis de Ambiente
+
+Edite o arquivo `.env` com suas informações.
+
+### Executar em Desenvolvimento
+
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Build para Produção
 
-```sh
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+Os arquivos estáticos serão gerados na pasta `dist/`
 
-```sh
-npm run lint
-```
+## 🛠️ Stack Tecnológico
+
+- **Frontend**: Vue 3 com Composition API
+- **Build Tool**: Vite
+- **Estilos**: SASS/SCSS
+- **UI Components**: Bootstrap 5
+- **Ícones**: Bootstrap Icons
+- **Analytics**: Google Analytics 4
+
+## 📈 Recursos Futuros Propostos
+
+- 🔄 **Exportar para Whatsapp**: ao invés de copiar os textos gerados com os números para colar nos grupos de whatsapp, adicionar a opção de exportar para whatsapp
+- 🌙 **Modo Escuro**: Interface otimizada para ambientes com pouca luz
+- 🌐 **Suporte a Múltiplos Idiomas**: Adicionar português, inglês e espanhol
