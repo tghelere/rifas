@@ -236,6 +236,32 @@ export function useRifaLogic(config) {
             })
     }
 
+    // whatsapp sharing utility
+    function shareViaWhatsapp(mensagem) {
+        const encoded = encodeURIComponent(mensagem)
+        const url = `https://api.whatsapp.com/send?text=${encoded}`
+        try {
+            window.open(url, '_blank')
+            return true
+        } catch (e) {
+            console.warn('Erro ao abrir WhatsApp:', e)
+            return false
+        }
+    }
+
+    function compartilharNumeros(numeros) {
+        const mensagem = numeros === numerosDisponiveis.value ? `Ainda existem ${numeros.length} números disponíveis, são eles: ${numeros.join(', ')}.` : `Números escolhidos: ${numeros.join(', ')}`
+        if (shareViaWhatsapp(mensagem)) {
+            mostrarToast('Abrindo WhatsApp...')
+            const tipoNumeros = numeros === numerosDisponiveis.value ? 'disponíveis' : 'sorteados'
+            registrarEvento('compartilhar_numeros', {
+                event_category: 'Interação',
+                event_label: `Compartilhou números ${tipoNumeros}`,
+                quantidade_numeros: numeros.length
+            })
+        }
+    }
+
     function copiarTodosNaoPagos() {
         if (!totalNaoPagos.value) {
             mostrarToast('Nenhum número não pago para copiar.')
@@ -269,6 +295,36 @@ Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es
             .catch(() => {
                 mostrarToast('Erro ao copiar os números.')
             })
+    }
+
+    function compartilharTodosNaoPagos() {
+        if (!totalNaoPagos.value) {
+            mostrarToast('Nenhum número não pago para compartilhar.')
+            return
+        }
+
+        const linhas = []
+        for (const [comprador, numeros] of Object.entries(numerosNaoPagosAgrupados.value)) {
+            const numerosOrdenados = numeros.sort((a, b) => a - b).join(', ')
+            const quantidadeTexto = numeros.length === 1 ? 'número' : 'números'
+            linhas.push(`${comprador}: ${numeros.length} ${quantidadeTexto} (${numerosOrdenados})`)
+        }
+
+        const mensagem = `Números que ainda faltam pagar:
+
+${linhas.join('\n')}
+
+Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es)`
+
+        if (shareViaWhatsapp(mensagem)) {
+            mostrarToast('Abrindo WhatsApp...')
+            registrarEvento('compartilhar_todos_nao_pagos', {
+                event_category: 'Interação',
+                event_label: 'Compartilhou números não pagos',
+                quantidade_numeros: totalNaoPagos.value,
+                quantidade_compradores: totalCompradores.value
+            })
+        }
     }
 
     function incrementarQuantidade() {
@@ -320,6 +376,8 @@ Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es
         colarTexto,
         copiarNumeros,
         copiarTodosNaoPagos,
+        compartilharTodosNaoPagos,
+        compartilharNumeros,
         incrementarQuantidade,
         decrementarQuantidade,
         registrarEvento

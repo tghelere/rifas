@@ -14,9 +14,12 @@
                     <hr class="my-2" />
                     <div class="small text-muted"><strong>Total:</strong> {{ totalUnpaid }} números não pagos</div>
                 </div>
-                <div class="d-flex justify-content-center">
-                    <button class="btn btn-info" style="min-width: 300px" @click="emit('copy')" title="Copiar números não pagos">
+                <div class="d-flex justify-content-center action-btns">
+                    <button class="btn btn-info action-btn" @click="emit('copy')" title="Copiar números não pagos">
                         <i class="bi bi-files"></i> Copiar números não pagos
+                    </button>
+                    <button class="btn btn-success ms-2 action-btn" @click="emit('share')" title="Compartilhar via WhatsApp">
+                        <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
                     </button>
                 </div>
             </div>
@@ -32,7 +35,7 @@ const props = defineProps({
     unpaidGrouped: Object
 })
 
-const emit = defineEmits(['copy'])
+const emit = defineEmits(['copy','share'])
 
 const totalUnpaid = computed(() => {
     if (!props.unpaidGrouped) return 0
@@ -53,6 +56,28 @@ const totalUnpaid = computed(() => {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+.action-btns {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.action-btn {
+    min-width: 300px;
+}
+@media (max-width: 576px) {
+    .action-btns {
+        flex-direction: column !important;
+        align-items: stretch;
+    }
+    .action-btn {
+        min-width: unset;
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    .action-btn + .action-btn {
+        margin-top: 0.5rem;
     }
 }
 </style>

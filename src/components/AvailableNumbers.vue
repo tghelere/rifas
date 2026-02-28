@@ -7,9 +7,12 @@
                 </label>
                 <div class="border p-4 w-100 text-center">
                     <p class="text-warning">{{ numeros.join(', ') }}</p>
-                    <div class="mx-auto w-100">
-                        <button class="btn btn-info mt-2" @click="emit('copy')" title="Copiar números disponíveis">
+                    <div class="mx-auto w-100 d-flex justify-content-center action-btns">
+                        <button class="btn btn-info mt-2 action-btn" @click="emit('copy')" title="Copiar números disponíveis">
                             <i class="bi bi-files"></i> Copiar números disponíveis
+                        </button>
+                        <button class="btn btn-success mt-2 ms-2 action-btn" @click="emit('share')" title="Compartilhar via WhatsApp">
+                            <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
                         </button>
                     </div>
                 </div>
@@ -61,7 +64,7 @@ defineProps({
     validationError: String
 })
 
-const emit = defineEmits(['copy', 'incrementQuantity', 'decrementQuantity', 'updateQuantity', 'draw'])
+const emit = defineEmits(['copy','share', 'incrementQuantity', 'decrementQuantity', 'updateQuantity', 'draw'])
 </script>
 
 <style scoped lang="scss">
@@ -87,6 +90,28 @@ input[type='number'] {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+.action-btns {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.action-btn {
+    min-width: 300px;
+}
+@media (max-width: 576px) {
+    .action-btns {
+        flex-direction: column !important;
+        align-items: stretch;
+    }
+    .action-btn {
+        min-width: unset;
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    .action-btn + .action-btn {
+        margin-top: 0.5rem;
     }
 }
 </style>

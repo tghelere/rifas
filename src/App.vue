@@ -21,6 +21,7 @@
             :validationError="erroValidacao"
             ref="disponiveisRef"
             @copy="copiarNumeros(numerosDisponiveis)"
+            @share="compartilharNumeros(numerosDisponiveis)"
             @incrementQuantity="incrementarQuantidade"
             @decrementQuantity="decrementarQuantidade"
             @updateQuantity="quantidadeGerar = $event"
@@ -32,9 +33,10 @@
             :unpaidGrouped="numerosNaoPagosAgrupados"
             ref="disponiveisRef"
             @copy="copiarTodosNaoPagos"
+            @share="compartilharTodosNaoPagos"
         />
 
-        <DrawHistory :visible="historico.length > 0" :history="historico" :highlightedKey="ultimoGrupoAnimado" ref="historicoRef" @copy="copiarNumeros" />
+        <DrawHistory :visible="historico.length > 0" :history="historico" :highlightedKey="ultimoGrupoAnimado" ref="historicoRef" @copy="copiarNumeros" @share="compartilharNumeros" />
 
         <Toast :toast="toast" />
     </div>
@@ -77,6 +79,8 @@ const {
     colarTexto,
     copiarNumeros,
     copiarTodosNaoPagos,
+    compartilharNumeros,
+    compartilharTodosNaoPagos,
     incrementarQuantidade,
     decrementarQuantidade,
     registrarEvento
