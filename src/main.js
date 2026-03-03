@@ -8,7 +8,6 @@ import './assets/styles/main.scss'
 
 const app = createApp(App)
 
-// Configura o Google Analytics
 setupAnalytics(app)
 
 app.mount('#app')

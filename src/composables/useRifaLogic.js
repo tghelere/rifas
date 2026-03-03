@@ -5,7 +5,7 @@ const REGEX_NUMERO_COM_NOME = /^\s*(\d{1,3})\s*-\s*(.*)$/
 const ICONE_PAGO = ['💰', '💸']
 const TOAST_DURATION = 2500
 
-export function useRifaLogic(config) {
+export function useRifaLogic() {
     const instance = getCurrentInstance()
     const app = instance?.appContext.config.globalProperties || {}
 
@@ -99,14 +99,41 @@ export function useRifaLogic(config) {
 
     function rolarParaResultados() {
         nextTick(() => {
-            disponiveisRef.value?.scrollIntoView({ behavior: 'smooth' })
+            rolarPara(disponiveisRef)
         })
     }
 
     function rolarParaHistorico() {
         nextTick(() => {
-            historicoRef.value?.scrollIntoView({ behavior: 'smooth' })
+            rolarPara(historicoRef)
         })
+    }
+
+    function rolarPara(refWrapper) {
+        try {
+            const target = refWrapper?.value
+            if (!target) return
+
+            if (typeof target.scrollIntoView === 'function') {
+                target.scrollIntoView({ behavior: 'smooth' })
+                return
+            }
+
+            if (target.$el && typeof target.$el.scrollIntoView === 'function') {
+                target.$el.scrollIntoView({ behavior: 'smooth' })
+                return
+            }
+
+            const root = target.$el || target
+            if (root && typeof root.querySelector === 'function') {
+                const inner = root.querySelector('div, section, main, article, ul, ol') || root
+                if (inner && typeof inner.scrollIntoView === 'function') {
+                    inner.scrollIntoView({ behavior: 'smooth' })
+                }
+            }
+        } catch (err) {
+            console.warn('Erro ao rolar para elemento:', err)
+        }
     }
 
     function mostrarToast(msg) {
@@ -215,6 +242,7 @@ export function useRifaLogic(config) {
             mostrarToast('Texto colado.')
         } catch (err) {
             mostrarToast('Erro ao acessar a área de transferência.')
+            console.error(err);
         }
     }
 
@@ -236,10 +264,23 @@ export function useRifaLogic(config) {
             })
     }
 
-    // whatsapp sharing utility
-    function shareViaWhatsapp(mensagem) {
+    async function enviarPorWhatsapp(mensagem) {
         const encoded = encodeURIComponent(mensagem)
-        const url = `https://api.whatsapp.com/send?text=${encoded}`
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+        if (isMobile && navigator.share) {
+            try {
+                await navigator.share({ text: mensagem })
+                return true
+            } catch (err) {
+                console.warn('Web Share API falhou:', err)
+                // fall through to whatsapp:// fallback on mobile
+            }
+        }
+
+        const url = isMobile ? `whatsapp://send?text=${encoded}` : `https://api.whatsapp.com/send?text=${encoded}`
+
         try {
             window.open(url, '_blank')
             return true
@@ -249,9 +290,9 @@ export function useRifaLogic(config) {
         }
     }
 
-    function compartilharNumeros(numeros) {
+    async function compartilharNumeros(numeros) {
         const mensagem = numeros === numerosDisponiveis.value ? `Ainda existem ${numeros.length} números disponíveis, são eles: ${numeros.join(', ')}.` : `Números escolhidos: ${numeros.join(', ')}`
-        if (shareViaWhatsapp(mensagem)) {
+        if (await enviarPorWhatsapp(mensagem)) {
             mostrarToast('Abrindo WhatsApp...')
             const tipoNumeros = numeros === numerosDisponiveis.value ? 'disponíveis' : 'sorteados'
             registrarEvento('compartilhar_numeros', {
@@ -275,11 +316,7 @@ export function useRifaLogic(config) {
             linhas.push(`${comprador}: ${numeros.length} ${quantidadeTexto} (${numerosOrdenados})`)
         }
 
-        const mensagem = `Números que ainda faltam pagar:
-
-${linhas.join('\n')}
-
-Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es)`
+        const mensagem = `Números que ainda faltam pagar: ${linhas.join('\n')} Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es)`
 
         navigator.clipboard
             .writeText(mensagem)
@@ -297,7 +334,7 @@ Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es
             })
     }
 
-    function compartilharTodosNaoPagos() {
+    async function compartilharTodosNaoPagos() {
         if (!totalNaoPagos.value) {
             mostrarToast('Nenhum número não pago para compartilhar.')
             return
@@ -310,13 +347,9 @@ Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es
             linhas.push(`${comprador}: ${numeros.length} ${quantidadeTexto} (${numerosOrdenados})`)
         }
 
-        const mensagem = `Números que ainda faltam pagar:
+        const mensagem = `Números que ainda faltam pagar: ${linhas.join('\n')} Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es)`
 
-${linhas.join('\n')}
-
-Total: ${totalNaoPagos.value} números de ${totalCompradores.value} comprador(es)`
-
-        if (shareViaWhatsapp(mensagem)) {
+        if (await enviarPorWhatsapp(mensagem)) {
             mostrarToast('Abrindo WhatsApp...')
             registrarEvento('compartilhar_todos_nao_pagos', {
                 event_category: 'Interação',
