@@ -1028,12 +1028,7 @@ Não substituir o logo existente sem solicitação.
 
 # 33. Título da página
 
-Há uma pequena inconsistência a observar, não necessariamente um bug:
-
-- `index.html` define `<title>Números disponíveis</title>` como título estático inicial.
-- Antes (versão anterior do App.vue), `document.title = 'Sorteador de rifas'` era setado em runtime. **No `App.vue` atual não há mais essa linha** — não foi encontrada nenhuma atribuição a `document.title` no código-fonte atual.
-
-Ou seja: hoje o título efetivo da aba é "Números disponíveis" (vindo do `index.html`), não "Sorteador de Rifas". Não "corrigir" silenciosamente — confirmar com o usuário se isso é intencional antes de mexer, pois pode ter relação com SEO/branding.
+`index.html` define `<title>Sorteador de Rifas</title>` como título estático. A tag `<html>` usa `lang="pt-BR"` e há uma `<meta name="description">` objetiva sobre a ferramenta. Não há atribuição a `document.title` em runtime no código-fonte atual — o título vem inteiramente do `index.html`.
 
 ---
 
