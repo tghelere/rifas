@@ -1010,7 +1010,9 @@ Evitar:
 
 # 32. Logo / favicon
 
-Existem imagens públicas em `public/`: `apple-touch-icon.png`, `favicon-16x16.png`, `favicon-32x32.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `bg.jpg`.
+Existem imagens públicas em `public/`: `apple-touch-icon.png`, `favicon-16x16.png`, `favicon-32x32.png`, `favicon.ico`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `bg.jpg`.
+
+`favicon.ico` é multi-resolução (16x16 e 32x32), gerado a partir dos PNGs existentes (`favicon-16x16.png`/`favicon-32x32.png`). `index.html` já referenciava `/favicon.ico?v=2`, mas o arquivo não existia em `public/` — foi adicionado para satisfazer essa referência.
 
 O logo é usado hoje dentro de `AppHeader.vue`:
 
