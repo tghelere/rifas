@@ -1059,7 +1059,7 @@ O que já existe:
 
 - `index.html` já referencia `<link rel="manifest" href="/site.webmanifest">` e os ícones (`apple-touch-icon`, favicons).
 - `public/site.webmanifest` existe, com os ícones 192x192 e 512x512 apontados, `display: "standalone"`, `theme_color`/`background_color` em `#ffffff`.
-- **Porém** `name` e `short_name` no manifest estão vazios (`""`). Isso deve ser preenchido antes de considerar o PWA "pronto" — sem isso, a instalação exibirá nome vazio.
+- ✅ `name` e `short_name` no manifest preenchidos com "Sorteador de Rifas" e "Rifas" respectivamente.
 
 O que ainda falta (não implementado):
 
