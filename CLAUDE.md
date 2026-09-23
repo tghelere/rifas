@@ -568,8 +568,8 @@ Diferente de versões anteriores, os dados de contato **não estão mais hardcod
 ```js
 // src/config.js
 export const config = {
-    whatsappNumber: import.meta.env.WHATSAPP_NUMBER,
-    emailAddress: import.meta.env.EMAIL_ADDRESS,
+    whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER,
+    emailAddress: import.meta.env.VITE_EMAIL_ADDRESS,
     emailSubject: 'Anúncio no Sorteador de Rifas',
     emailBody: 'Gostaria de anunciar meu produto ou serviço no Sorteador de Rifas.',
     exibirAd: false
@@ -579,11 +579,11 @@ export const config = {
 Os valores reais ficam em `.env` (não versionado, está no `.gitignore`). `.env.example` documenta as chaves esperadas:
 
 ```text
-WHATSAPP_NUMBER=
-EMAIL_ADDRESS=
+VITE_WHATSAPP_NUMBER=
+VITE_EMAIL_ADDRESS=
 ```
 
-**Ponto de atenção não confirmado:** essas variáveis não usam o prefixo `VITE_`. Por padrão, o Vite só expõe ao client (`import.meta.env`) variáveis prefixadas com `VITE_`, a menos que `envPrefix` tenha sido alterado em `vite.config.js` — o que não é o caso hoje (`vite.config.js` não define `envPrefix`). Não assumir que isso é bug nem "corrigir" sem confirmar com o usuário; apenas verificar o comportamento real (`console.log(config)` em dev/build) antes de mexer em `config.js`, `.env` ou `vite.config.js` por causa disso.
+As variáveis usam o prefixo `VITE_` (corrigido — anteriormente eram `WHATSAPP_NUMBER`/`EMAIL_ADDRESS` sem prefixo, e por isso não eram expostas ao client via `import.meta.env`, já que o Vite só expõe variáveis prefixadas com `VITE_` por padrão). Confirmado via build que os valores são lidos corretamente.
 
 `exibirAd` controla se o card de anúncio (`AdBanner`) aparece; hoje está fixo em `false` no código-fonte.
 
