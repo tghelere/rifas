@@ -18,7 +18,7 @@ footer {
 }
 
 .softhing-logo {
-    height: 16px;
+    height: 24px;
     vertical-align: middle;
     margin-left: 4px;
 }
