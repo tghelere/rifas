@@ -209,8 +209,7 @@ export function useRifaLogic() {
         registrarEvento('sortear_numeros', {
             event_category: 'Interação',
             event_label: 'Sorteio executado',
-            quantidade_sorteada: quantidadeGerar.value,
-            numeros: grupo.join(',')
+            quantidade_sorteada: quantidadeGerar.value
         })
 
         const mensagemToast = quantidadeGerar.value === 1 ? 'Um novo número foi sorteado' : `${quantidadeGerar.value} novos números foram sorteados`

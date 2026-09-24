@@ -354,14 +354,11 @@ Exemplo real (`gerarAleatorios`):
 registrarEvento('sortear_numeros', {
     event_category: 'Interação',
     event_label: 'Sorteio executado',
-    quantidade_sorteada: quantidadeGerar.value,
-    numeros: grupo.join(',')
+    quantidade_sorteada: quantidadeGerar.value
 })
 ```
 
 Note que `event_category`/`event_label` continuam sendo usados como campos dentro do objeto `dados` (não foram abandonados), mas agora convivem com campos mais descritivos como `quantidade_sorteada`, `quantidade_numeros`, `quantidade_compradores`, etc.
-
-**Atenção:** o evento `sortear_numeros` atualmente envia `numeros: grupo.join(',')`, ou seja, os números sorteados individuais. Isso é uma aparente contradição com a seção 46 (não enviar números individuais sorteados). Não remover/alterar esse campo sem confirmar com o usuário — apenas está documentado aqui para não ser "corrigido" silenciosamente numa tarefa não relacionada.
 
 Não é necessário refatorar tudo apenas por isso. Se os eventos forem revisados, fazer a mudança de maneira consistente.
 
@@ -398,8 +395,7 @@ registrarEvento('buscar_nao_pagos', {
 registrarEvento('sortear_numeros', {
     event_category: 'Interação',
     event_label: 'Sorteio executado',
-    quantidade_sorteada: quantidadeGerar.value,
-    numeros: grupo.join(',')
+    quantidade_sorteada: quantidadeGerar.value
 })
 ```
 
@@ -1311,7 +1307,7 @@ Não enviar para Google Analytics:
 
 Desde que não permitam identificar o usuário ou conteúdo privado.
 
-**Ver seção 11**: o evento `sortear_numeros` hoje envia os números individuais sorteados (`numeros: grupo.join(',')`), o que está em tensão com esta regra ("não enviar números individuais sorteados"). Isso é uma divergência real entre código e regra, documentada aqui para visibilidade — não corrigir silenciosamente numa tarefa não relacionada; e ao tocar nesse evento, perguntar antes de remover o campo.
+O evento `sortear_numeros` (seção 11) já segue esta regra: envia apenas `quantidade_sorteada`, sem os números individuais sorteados.
 
 ---
 
