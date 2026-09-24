@@ -1,6 +1,6 @@
 import { ref, computed, nextTick, getCurrentInstance } from 'vue'
 
-const REGEX_NUMERO_VAZIO = /^\s*(\d{1,3})\s*-\s*$/
+const REGEX_NUMERO_VAZIO = /^\s*(\d{1,3})\s*-?\s*$/
 const REGEX_NUMERO_COM_NOME = /^\s*(\d{1,3})\s*-\s*(.*)$/
 const ICONE_PAGO = ['💰', '💸']
 const TOAST_DURATION = 2500

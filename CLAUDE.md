@@ -604,12 +604,13 @@ Existem **duas buscas**, ambas operando sobre `texto.value.split(/\r?\n/)`, dent
 Regex:
 
 ```js
-const REGEX_NUMERO_VAZIO = /^\s*(\d{1,3})\s*-\s*$/
+const REGEX_NUMERO_VAZIO = /^\s*(\d{1,3})\s*-?\s*$/
 ```
 
 - aceita de 1 a 3 dígitos;
-- aceita espaços antes do número, entre o número e o hífen, e depois do hífen;
-- exige que a linha contenha somente esse padrão (nada depois do hífen).
+- aceita espaços antes do número, entre o número e o hífen (se houver), e depois do hífen;
+- **o hífen é opcional**: tanto `16-` quanto `16` sozinho na linha (sem hífen e sem nome) contam como número disponível;
+- exige que a linha contenha somente esse padrão (nada depois do hífen, quando presente, e nenhum outro caractere além do número/hífen/espaços).
 
 Resultado vai para `numerosDisponiveis` (array de `Number`). Depois: `limparResultados()`, `tipoUltimaBusca = 'disponivel'`, scroll suave até o card de disponíveis, evento `buscar_numeros`, toast.
 
