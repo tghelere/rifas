@@ -129,6 +129,8 @@ src/
     App.vue                          # orquestração: liga o composable aos componentes de UI
     main.js
     config.js                        # dados de contato do anúncio (via env vars)
+    data/
+        anunciantes.js               # array de anunciantes do AdBanner (hoje vazio, seção 16)
     composables/
         useRifaLogic.js              # todo o estado e a lógica de negócio da aplicação
     plugins/
@@ -138,7 +140,7 @@ src/
         AppFooter.vue
         HelpModal.vue                # modal "Como usar"
         TextInput.vue                # textarea + botões Colar / Buscar disponíveis / Não pagos / Limpar
-        AdBanner.vue                 # card de anúncio (WhatsApp / E-mail)
+        AdBanner.vue                 # carrossel de anunciantes + estado de "vaga disponível" (seção 16)
         AvailableNumbers.vue         # card de números disponíveis + sorteio
         UnpaidNumbers.vue            # card de números não pagos, agrupados por comprador
         DrawHistory.vue              # histórico de sorteios
@@ -581,8 +583,6 @@ VITE_EMAIL_ADDRESS=
 
 As variáveis usam o prefixo `VITE_` (corrigido — anteriormente eram `WHATSAPP_NUMBER`/`EMAIL_ADDRESS` sem prefixo, e por isso não eram expostas ao client via `import.meta.env`, já que o Vite só expõe variáveis prefixadas com `VITE_` por padrão). Confirmado via build que os valores são lidos corretamente.
 
-`exibirAd` controla se o card de anúncio (`AdBanner`) aparece; hoje está fixo em `false` no código-fonte.
-
 Links são montados em `App.vue`:
 
 ```js
@@ -592,6 +592,28 @@ const linkEmail = computed(() => `mailto:${config.emailAddress}?subject=${encode
 ```
 
 Não duplicar ou expor os valores reais de `.env` em documentação externa. Preservar os valores já existentes.
+
+**`exibirAd` não é mais lido pelo `AdBanner`** (ver mudança abaixo). O campo continua existindo em `config.js` (não foi removido/alterado), mas está sem efeito hoje — não é referenciado em nenhum componente.
+
+## AdBanner: carrossel de anunciantes com estado de "vaga disponível"
+
+`AdBanner.vue` deixou de ser um convite genérico estático e agora é um carrossel simples que exibe anunciantes reais em rodízio, com um estado padrão de "vaga disponível" quando não há nenhum anunciante ativo.
+
+**Fonte de dados**: `src/data/anunciantes.js`, exportando um array `anunciantes`. Cada item: `{ id, nome, descricao, icone (classe do Bootstrap Icons, ex: 'bi-shop'), destaque (string opcional, pode ser vazio), whatsapp (número), site (URL), ativo (boolean) }`. Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
+
+**Regras de exibição** (`AdBanner.vue` filtra apenas os itens com `ativo: true`):
+
+- **0 anunciantes ativos** (caso atual, array vazio): mostra um único slide fixo de "vaga disponível" — nome "Sua empresa aqui", descrição "Anuncie seu produto ou serviço para quem usa esta ferramenta", sem linha de destaque, com os dois botões apontando para o WhatsApp/e-mail de `config.js` (`whatsappLink`/`emailLink`, os mesmos usados historicamente pelo AdBanner) — nunca para uma empresa inventada.
+- **1 anunciante ativo**: mostra esse anunciante fixo, sem rodízio nem pontinhos.
+- **2+ anunciantes ativos**: a ordem da lista é embaralhada (Fisher-Yates) uma vez ao carregar o componente — não é sempre a mesma ordem a cada carregamento. Rodízio automático a cada 7 segundos com fade simples (`<transition name="fade" mode="out-in">`), com pontinhos indicativos de posição (apenas indicativo, sem clique).
+
+**Altura estável entre slides**: todo slide (incluindo o de "vaga disponível") usa exatamente a mesma estrutura de elementos, na mesma ordem — ícone, nome, descrição, linha de destaque, dois botões. A linha de destaque **sempre existe no DOM**, mesmo vazia; quando não há destaque, fica com `visibility: hidden` (nunca removida via `v-if`). A descrição é limitada a 2 linhas via `-webkit-line-clamp` com altura fixa em CSS (`height: 2.8em`), preenchendo o espaço mesmo com texto curto. Nada disso usa JavaScript para medir ou calcular alturas — é só CSS.
+
+**Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`), ocupando a largura inteira do container, sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
+
+**Mudança de comportamento importante**: o `AdBanner` **não depende mais** de `config.exibirAd` nem de `numerosDisponiveis.length > 0` para aparecer — antes ficava oculto (não havia anunciantes reais nem estado de fallback, e `exibirAd` era `false`); agora é sempre visível, como um bloco fixo da página (`App.vue` não passa mais prop `visible` para o `AdBanner`), pois sempre tem conteúdo (real ou "vaga disponível").
+
+Os eventos `abrir_whatsapp`/`abrir_email` (seção 12) continuam disparados a partir dos cliques nos botões do `AdBanner`, mas **somente no estado "vaga disponível"** — cliques em anunciantes reais não emitem esses eventos (não há, por enquanto, evento de Analytics dedicado a cliques em anúncios reais; avaliar se fizer sentido quando houver anunciantes cadastrados).
 
 ---
 
@@ -1614,7 +1636,7 @@ Se no futuro o projeto for usado para sorteios oficiais/regulados, essa questão
 
 # 63. Regra para links externos
 
-WhatsApp (anúncio, `AdBanner`): `target="_blank"`.
+WhatsApp/Site/E-mail (anúncio, `AdBanner`, seção 16): `target="_blank"` e `rel="noopener"`.
 
 WhatsApp (compartilhar números, seção 29): Web Share API no mobile quando disponível, senão `window.open` para deep link/`api.whatsapp.com`.
 
@@ -1695,7 +1717,7 @@ Se a tela estiver branca:
 
 main/container
     <TextInput>                   → textarea + Colar / Buscar disponíveis / Não pagos / Limpar
-    <AdBanner>                    → card de anúncio (WhatsApp / E-mail)
+    <AdBanner>                    → carrossel de anunciantes / "vaga disponível" (seção 16), sempre visível
     <AvailableNumbers>            → números disponíveis: quantidade, copiar, compartilhar,
                                      quantidade a sortear, incrementar/decrementar, Sortear
                                      (visível quando tipoUltimaBusca === 'disponivel')
@@ -1739,9 +1761,9 @@ As perguntas que o Analytics deve ajudar a responder são:
 
 ## Monetização futura
 
-A área do `AdBanner` ("Anuncie seus produtos ou serviços aqui!") existe como possível espaço publicitário, hoje desabilitada por padrão (`config.exibirAd = false`, seção 16).
+A área do `AdBanner` é o espaço publicitário da aplicação (seção 16): hoje sempre visível, mostrando anunciantes reais cadastrados em `src/data/anunciantes.js` em rodízio, ou um estado de "vaga disponível" enquanto esse array estiver vazio (caso atual).
 
-Eventos `abrir_whatsapp` e `abrir_email` servem para medir interesse comercial.
+Eventos `abrir_whatsapp` e `abrir_email` servem para medir interesse comercial — disparados a partir dos cliques no estado "vaga disponível".
 
 ---
 
@@ -1774,7 +1796,7 @@ Prioridade atual:
 6. Deploy estável.
 7. SEO.
 8. Melhorias visuais.
-9. Possível monetização por anúncios (`AdBanner` já existe, desabilitado).
+9. Monetização por anúncios (`AdBanner` já existe e está ativo, seção 16 — falta cadastrar anunciantes reais em `src/data/anunciantes.js`).
 
 Essa ordem é orientativa, não deve impedir mudanças solicitadas pelo usuário.
 

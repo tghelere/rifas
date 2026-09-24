@@ -7,7 +7,6 @@
         <TextInput v-model="texto" @openHelp="mostrarHelp = true" @paste="colarTexto" @search="executar" @searchUnpaid="executarNaoPagos" @clear="limparTudo" />
 
         <AdBanner
-            :visible="numerosDisponiveis.length > 0 && config.exibirAd"
             :whatsappLink="linkWhats"
             :emailLink="linkEmail"
             @contactWhatsapp="registrarEvento('abrir_whatsapp', { event_category: 'Anúncio', event_label: 'Clique em WhatsApp' })"
