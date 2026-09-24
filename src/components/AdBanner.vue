@@ -1,7 +1,15 @@
 <template>
     <div v-if="visible" class="card border-1 mb-3">
         <div class="card-body p-0 pb-3 text-center">
-            <div id="ad-carousel" ref="carouselRef" class="carousel slide carousel-fade" @pointerdown="onPointerDown" @pointerup="onPointerUp" @pointercancel="onPointerCancel">
+            <div
+                id="ad-carousel"
+                ref="carouselRef"
+                :class="['carousel', 'slide', 'carousel-fade', { 'tipo-imagem-ativo': tipoAtivo === 'imagem' }]"
+                @pointerdown="onPointerDown"
+                @pointermove="onPointerMove"
+                @pointerup="onPointerUp"
+                @pointercancel="onPointerCancel"
+            >
                 <div class="carousel-inner">
                     <div v-for="(slide, idx) in slides" :key="slide.id" :class="['carousel-item', { active: idx === 0 }]">
                         <div class="slide-body">
@@ -199,7 +207,13 @@ function ctaStyle(slide) {
 }
 
 const carouselRef = ref(null)
+const tipoAtivo = ref(slides[0] ? slides[0].tipo : 'card')
 let carouselInstance = null
+
+function onSlideChange(e) {
+    const proximo = slides[e.to]
+    tipoAtivo.value = proximo ? proximo.tipo : 'card'
+}
 
 function iniciarCarousel() {
     if (slides.length > 1 && carouselRef.value && !carouselInstance) {
@@ -210,11 +224,13 @@ function iniciarCarousel() {
             touch: true,
             wrap: true
         })
+        carouselRef.value.addEventListener('slide.bs.carousel', onSlideChange)
     }
 }
 
 function pararCarousel() {
     if (carouselInstance) {
+        carouselRef.value?.removeEventListener('slide.bs.carousel', onSlideChange)
         carouselInstance.dispose()
         carouselInstance = null
     }
@@ -242,33 +258,78 @@ function onCtaClick() {
 }
 
 // Arrastar com o mouse no desktop (o Carousel do Bootstrap só arrasta por toque real).
+// O slide ativo acompanha o cursor em tempo real (transform manual); ao soltar, completa
+// a transição via carouselInstance.next()/.prev() (se passou do limiar) ou volta ao lugar.
+const ARRASTO_MAX = 80
+
 let arrastoInicioX = null
+let arrastoAtivo = false
+
+function elementoArrastavel() {
+    return carouselRef.value?.querySelector('.carousel-item.active .slide-body') || null
+}
+
+function aplicarResistencia(delta) {
+    const sinal = delta < 0 ? -1 : 1
+    const abs = Math.abs(delta)
+    if (abs <= ARRASTO_MAX) return delta
+    return sinal * (ARRASTO_MAX + (abs - ARRASTO_MAX) * 0.25)
+}
+
+function resetarArrasto(comAnimacao) {
+    const el = elementoArrastavel()
+    if (!el) return
+    el.style.transition = comAnimacao ? 'transform 0.25s ease' : 'none'
+    el.style.transform = ''
+}
 
 function onPointerDown(e) {
     if (e.pointerType === 'touch' || !carouselInstance) return
     if (e.target.closest('a, button')) return
     arrastoInicioX = e.clientX
+    arrastoAtivo = true
     e.currentTarget.setPointerCapture(e.pointerId)
 }
 
+function onPointerMove(e) {
+    if (!arrastoAtivo || e.pointerType === 'touch') return
+    const delta = aplicarResistencia(e.clientX - arrastoInicioX)
+    const el = elementoArrastavel()
+    if (!el) return
+    el.style.transition = 'none'
+    el.style.transform = `translateX(${delta}px)`
+}
+
 function onPointerUp(e) {
-    if (e.pointerType === 'touch' || arrastoInicioX === null || !carouselInstance) return
+    if (e.pointerType === 'touch' || !arrastoAtivo || !carouselInstance) return
+    arrastoAtivo = false
     const deltaX = e.clientX - arrastoInicioX
     arrastoInicioX = null
-    if (Math.abs(deltaX) < LIMIAR_ARRASTO) return
-    if (deltaX < 0) {
-        carouselInstance.next()
+    if (Math.abs(deltaX) >= LIMIAR_ARRASTO) {
+        resetarArrasto(false)
+        if (deltaX < 0) {
+            carouselInstance.next()
+        } else {
+            carouselInstance.prev()
+        }
     } else {
-        carouselInstance.prev()
+        resetarArrasto(true)
     }
 }
 
 function onPointerCancel() {
+    if (arrastoAtivo) resetarArrasto(true)
+    arrastoAtivo = false
     arrastoInicioX = null
 }
 </script>
 
 <style scoped lang="scss">
+.card-body {
+    border-radius: inherit;
+    overflow: hidden;
+}
+
 .slide-body {
     height: 260px;
 }
@@ -331,7 +392,7 @@ function onPointerCancel() {
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 10px 16px 14px;
+    padding: 10px 16px 34px;
     color: #ffffff;
 }
 
@@ -361,8 +422,9 @@ function onPointerCancel() {
 
 .carousel-indicators {
     position: absolute;
-    top: 92px;
-    bottom: auto;
+    /* Padrão: slide tipo 'card' — perto da base do bloco de foto (120px), nunca no meio da altura. */
+    top: auto;
+    bottom: 150px;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
@@ -372,6 +434,12 @@ function onPointerCancel() {
     background-color: rgba(0, 0, 0, 0.35);
     border-radius: 999px;
     gap: 6px;
+    z-index: 5;
+}
+
+/* Slide tipo 'imagem' ativo — perto da base da imagem inteira (260px), acima do texto/botões. */
+#ad-carousel.tipo-imagem-ativo .carousel-indicators {
+    bottom: 10px;
 }
 
 .carousel-indicators [data-bs-target] {

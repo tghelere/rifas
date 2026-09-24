@@ -32,7 +32,7 @@ export const anunciantesExemplo = [
         tipo: 'card',
         imagemUrl: '',
         whatsapp: '5511999990002',
-        site: 'https://www.softhing.com.br',
+        site: '',
         ativo: true
     },
     {
@@ -46,7 +46,7 @@ export const anunciantesExemplo = [
         destaque: '',
         tipo: 'card',
         imagemUrl: '',
-        whatsapp: '5511999990003',
+        whatsapp: '',
         site: 'https://www.softhing.com.br',
         ativo: true
     },
@@ -60,7 +60,7 @@ export const anunciantesExemplo = [
         categoria: '',
         destaque: '',
         tipo: 'imagem',
-        imagemUrl: '/anunciantes/exemplo-4.jpg',
+        imagemUrl: '/anunciantes/exemplo-5.jpg',
         titulo: 'Sua próxima pescaria começa aqui',
         subtitulo: 'Roteiros guiados de pesca esportiva',
         whatsapp: '5511999990004',
