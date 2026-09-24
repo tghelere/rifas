@@ -1324,17 +1324,19 @@ Não implementar um sistema complexo de consentimento sem necessidade, mas não 
 
 # 48. SEO
 
-Como a aplicação é uma ferramenta pública, considerar posteriormente:
+Status atual:
 
-- title (ver seção 33 — inconsistência a resolver);
-- meta description;
-- canonical;
-- Open Graph;
-- favicon (já existe);
-- manifest (já existe, mas incompleto — seção 35);
-- robots.txt;
-- sitemap.xml;
-- JSON-LD se fizer sentido.
+- ✅ title (seção 33);
+- ✅ meta description;
+- ✅ canonical (`https://sortrifas.com.br/`);
+- ✅ Open Graph (`og:title`, `og:description`, `og:type=website`, `og:url`, `og:image`) — `og:image` usa `public/bg.jpg` como imagem temporária (863 KB, 4272x2848px). Não é uma imagem dedicada de 1200x630 otimizada para preview social; substituir quando houver uma imagem própria para esse fim.
+- ✅ favicon (já existia);
+- ✅ manifest (seção 35, já resolvido);
+- ✅ robots.txt (`public/robots.txt`, libera tudo e aponta para o sitemap);
+- ✅ sitemap.xml (`public/sitemap.xml`, única URL — SPA de página única);
+- JSON-LD: ainda não implementado, avaliar se fizer sentido.
+
+Domínio de produção: `https://sortrifas.com.br`.
 
 Não implementar tudo de uma vez sem solicitação.
 
