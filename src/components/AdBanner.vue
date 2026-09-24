@@ -1,5 +1,5 @@
 <template>
-    <div class="card border-1 mb-3">
+    <div v-if="visible" class="card border-1 mb-3">
         <div class="card-body text-center">
             <transition name="fade" mode="out-in">
                 <div :key="currentSlide.id">
@@ -51,6 +51,7 @@ import { anunciantes } from '../data/anunciantes.js'
 const ROTATION_INTERVAL = 7000
 
 const props = defineProps({
+    visible: Boolean,
     whatsappLink: String,
     emailLink: String
 })

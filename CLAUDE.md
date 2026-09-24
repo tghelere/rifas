@@ -593,7 +593,7 @@ const linkEmail = computed(() => `mailto:${config.emailAddress}?subject=${encode
 
 Não duplicar ou expor os valores reais de `.env` em documentação externa. Preservar os valores já existentes.
 
-**`exibirAd` não é mais lido pelo `AdBanner`** (ver mudança abaixo). O campo continua existindo em `config.js` (não foi removido/alterado), mas está sem efeito hoje — não é referenciado em nenhum componente.
+`exibirAd` controla se o `AdBanner` pode aparecer; hoje está fixo em `false` no código-fonte. Ver regra completa de visibilidade abaixo.
 
 ## AdBanner: carrossel de anunciantes com estado de "vaga disponível"
 
@@ -611,7 +611,7 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
 
 **Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`), ocupando a largura inteira do container, sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
 
-**Mudança de comportamento importante**: o `AdBanner` **não depende mais** de `config.exibirAd` nem de `numerosDisponiveis.length > 0` para aparecer — antes ficava oculto (não havia anunciantes reais nem estado de fallback, e `exibirAd` era `false`); agora é sempre visível, como um bloco fixo da página (`App.vue` não passa mais prop `visible` para o `AdBanner`), pois sempre tem conteúdo (real ou "vaga disponível").
+**Condição de visibilidade (preservada da versão anterior ao carrossel)**: o `AdBanner` — seja mostrando um anunciante real, seja mostrando o card de "vaga disponível" — só aparece quando `numerosDisponiveis.length > 0` **e** `config.exibirAd` é `true`, exatamente como antes da reescrita. `App.vue` passa `:visible="numerosDisponiveis.length > 0 && config.exibirAd"` para o componente, que envolve o card inteiro em `v-if="visible"`. Ou seja: mesmo com anunciantes cadastrados e ativos, o bloco só aparece depois de uma busca de "disponíveis" bem-sucedida, e nunca aparece se `config.exibirAd` for `false` (caso atual). Como o componente só monta quando `visible` vira `true`, o embaralhamento da ordem (Fisher-Yates) e o início do rodízio acontecem nesse momento, não antes.
 
 Os eventos `abrir_whatsapp`/`abrir_email` (seção 12) continuam disparados a partir dos cliques nos botões do `AdBanner`, mas **somente no estado "vaga disponível"** — cliques em anunciantes reais não emitem esses eventos (não há, por enquanto, evento de Analytics dedicado a cliques em anúncios reais; avaliar se fizer sentido quando houver anunciantes cadastrados).
 
@@ -1717,7 +1717,8 @@ Se a tela estiver branca:
 
 main/container
     <TextInput>                   → textarea + Colar / Buscar disponíveis / Não pagos / Limpar
-    <AdBanner>                    → carrossel de anunciantes / "vaga disponível" (seção 16), sempre visível
+    <AdBanner>                    → carrossel de anunciantes / "vaga disponível" (seção 16),
+                                     visível apenas após busca de disponíveis e com config.exibirAd = true
     <AvailableNumbers>            → números disponíveis: quantidade, copiar, compartilhar,
                                      quantidade a sortear, incrementar/decrementar, Sortear
                                      (visível quando tipoUltimaBusca === 'disponivel')
@@ -1761,7 +1762,7 @@ As perguntas que o Analytics deve ajudar a responder são:
 
 ## Monetização futura
 
-A área do `AdBanner` é o espaço publicitário da aplicação (seção 16): hoje sempre visível, mostrando anunciantes reais cadastrados em `src/data/anunciantes.js` em rodízio, ou um estado de "vaga disponível" enquanto esse array estiver vazio (caso atual).
+A área do `AdBanner` é o espaço publicitário da aplicação (seção 16): mostra anunciantes reais cadastrados em `src/data/anunciantes.js` em rodízio, ou um estado de "vaga disponível" enquanto esse array estiver vazio (caso atual) — mas só depois de uma busca de disponíveis, e só com `config.exibirAd = true` (hoje `false`).
 
 Eventos `abrir_whatsapp` e `abrir_email` servem para medir interesse comercial — disparados a partir dos cliques no estado "vaga disponível".
 
@@ -1796,7 +1797,7 @@ Prioridade atual:
 6. Deploy estável.
 7. SEO.
 8. Melhorias visuais.
-9. Monetização por anúncios (`AdBanner` já existe e está ativo, seção 16 — falta cadastrar anunciantes reais em `src/data/anunciantes.js`).
+9. Monetização por anúncios (`AdBanner` já existe, seção 16 — hoje oculto por `config.exibirAd = false`; falta também cadastrar anunciantes reais em `src/data/anunciantes.js`).
 
 Essa ordem é orientativa, não deve impedir mudanças solicitadas pelo usuário.
 
