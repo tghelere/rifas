@@ -10,6 +10,8 @@
 //   imagemUrl, // obrigatório só quando tipo === 'imagem'; imagem de fundo cobrindo o bloco inteiro
 //   titulo,    // opcional; só usado quando tipo === 'imagem' — sobreposto na imagem (com degradê escuro por trás para legibilidade)
 //   subtitulo, // opcional; só usado quando tipo === 'imagem' — sobreposto abaixo do título
+//   posicaoY,  // opcional (número 0-100, padrão 50); aplica-se a `foto` OU `imagemUrl`. 0 = topo da imagem, 50 = centralizado (padrão), 100 = base. Controla o enquadramento vertical (background-position) e também é o ponto de origem do `zoom` abaixo.
+//   zoom,      // opcional (número, padrão 100, mínimo 100); aplica-se a `foto` OU `imagemUrl`. 100 = sem zoom extra (comportamento padrão, só o cover mínimo). Ex: 130 = amplia 30% além do cover, em torno do ponto definido por `posicaoY`.
 //   whatsapp, site, ativo
 // }
 //

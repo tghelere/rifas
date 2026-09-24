@@ -13,7 +13,8 @@
                 <div class="carousel-inner">
                     <div v-for="(slide, idx) in slides" :key="slide.id" :class="['carousel-item', { active: idx === 0 }]">
                         <div class="slide-body">
-                            <div v-if="slide.tipo === 'imagem'" class="slide-image-bg" :style="imagemBgStyle(slide)">
+                            <div v-if="slide.tipo === 'imagem'" class="slide-image-bg">
+                                <div class="slide-image-img" :style="imagemImgStyle(slide)"></div>
                                 <template v-if="slide.temOverlayImagem">
                                     <div class="slide-image-overlay"></div>
                                     <div class="slide-image-content">
@@ -39,7 +40,8 @@
                                 <a v-else class="slide-image-link" :href="slide.linkHref" target="_blank" rel="noopener" :title="slide.nome || 'Anúncio'"></a>
                             </div>
                             <template v-else>
-                                <div class="slide-photo" :style="fotoStyle(slide)">
+                                <div class="slide-photo" :style="{ backgroundColor: slide.cor || COR_PADRAO }">
+                                    <div v-if="slide.foto" class="slide-photo-img" :style="fotoImgStyle(slide)"></div>
                                     <div v-if="slide.foto" class="slide-photo-gradient" :style="gradienteStyle(slide)"></div>
                                     <span class="ad-label">Publicidade</span>
                                     <i v-if="slide.isVaga" :class="['bi', slide.icone, 'slide-photo-icon']"></i>
@@ -175,6 +177,8 @@ const slides = isVagaDisponivel
               icone: a.icone,
               cor: a.cor || COR_PADRAO,
               foto: a.foto || '',
+              posicaoY: a.posicaoY,
+              zoom: a.zoom,
               destaque: a.destaque || '',
               botoes,
               imagemUrl: a.imagemUrl || '',
@@ -185,11 +189,33 @@ const slides = isVagaDisponivel
           }
       })
 
-function fotoStyle(slide) {
-    if (slide.foto) {
-        return { backgroundImage: `url(${slide.foto})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+function clampPosicaoY(valor) {
+    const n = Number(valor)
+    if (Number.isNaN(n)) return 50
+    return Math.min(100, Math.max(0, n))
+}
+
+function clampZoom(valor) {
+    const n = Number(valor)
+    if (Number.isNaN(n)) return 100
+    return Math.max(100, n)
+}
+
+function estiloEnquadramento(url, posicaoY, zoom) {
+    const posY = clampPosicaoY(posicaoY)
+    const z = clampZoom(zoom)
+    return {
+        backgroundImage: `url(${url})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: `center ${posY}%`,
+        transform: `scale(${z / 100})`,
+        transformOrigin: `center ${posY}%`
     }
-    return { backgroundColor: slide.cor || COR_PADRAO }
+}
+
+function fotoImgStyle(slide) {
+    return estiloEnquadramento(slide.foto, slide.posicaoY, slide.zoom)
 }
 
 function gradienteStyle(slide) {
@@ -197,8 +223,8 @@ function gradienteStyle(slide) {
     return { background: `linear-gradient(to right, ${cor} 0%, transparent 25%, transparent 75%, ${cor} 100%)` }
 }
 
-function imagemBgStyle(slide) {
-    return { backgroundImage: `url(${slide.imagemUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+function imagemImgStyle(slide) {
+    return estiloEnquadramento(slide.imagemUrl, slide.posicaoY, slide.zoom)
 }
 
 function ctaStyle(slide) {
@@ -347,6 +373,11 @@ function onPointerCancel() {
     overflow: hidden;
 }
 
+.slide-photo-img {
+    position: absolute;
+    inset: 0;
+}
+
 .slide-photo-gradient {
     position: absolute;
     inset: 0;
@@ -374,6 +405,12 @@ function onPointerCancel() {
     position: relative;
     height: 100%;
     width: 100%;
+    overflow: hidden;
+}
+
+.slide-image-img {
+    position: absolute;
+    inset: 0;
 }
 
 .slide-image-link {

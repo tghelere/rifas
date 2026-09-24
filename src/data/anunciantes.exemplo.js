@@ -1,8 +1,9 @@
 // Dados ilustrativos para testar visualmente os formatos do AdBanner (não usado em produção).
-// Mesma forma de item que `anunciantes.js` — ver comentário lá.
+// Mesma forma de item que `anunciantes.js` — ver comentário lá (inclui os campos opcionais
+// `posicaoY`/`zoom` de enquadramento, ajustados abaixo observando cada foto real).
 //
-// `foto` e `imagemUrl` apontam para arquivos reais em `public/anunciantes/`
-// (exemplo-1.jpg a exemplo-4.jpg), como em dados de produção — nunca URLs externas.
+// `foto` e `imagemUrl` apontam para arquivos reais em `public/anunciantes/`, como em dados
+// de produção — nunca URLs externas.
 
 export const anunciantesExemplo = [
     {
@@ -11,7 +12,9 @@ export const anunciantesExemplo = [
         descricao: 'Produtos e serviços da região, com atendimento local.',
         icone: 'bi-shop',
         cor: '#0F6E56',
-        foto: '/anunciantes/exemplo-1.jpg',
+        foto: '/anunciantes/exemplo-6.jpg',
+        posicaoY: 50,
+        zoom: 112,
         categoria: 'empresa',
         destaque: '',
         tipo: 'card',
@@ -27,9 +30,26 @@ export const anunciantesExemplo = [
         icone: 'bi-box-seam',
         cor: '#0D6EFD',
         foto: '/anunciantes/exemplo-2.jpg',
+        posicaoY: 55,
+        zoom: 150,
         categoria: 'produto',
         destaque: 'Promoção por tempo limitado',
         tipo: 'card',
+        imagemUrl: '',
+        whatsapp: '5511999990002',
+        site: '',
+        ativo: true
+    },
+    {
+        id: 'exemplo-produto2',
+        nome: 'Kit Exemplo',
+        descricao: 'Produto ilustrativo para teste visual do carrossel, com cor de marca própria.',
+        icone: 'bi-box-seam',
+        cor: '#0D6EFD',
+        foto: '/anunciantes/exemplo-1.jpg',
+        categoria: 'produto',
+        destaque: 'Promoção por tempo limitado',
+        tipo: 'imagem',
         imagemUrl: '',
         whatsapp: '5511999990002',
         site: '',
@@ -41,7 +61,9 @@ export const anunciantesExemplo = [
         descricao: 'Prestação de serviço ilustrativa para teste visual do carrossel.',
         icone: 'bi-tools',
         cor: '#C1440E',
-        foto: '/anunciantes/exemplo-3.jpg',
+        foto: '/anunciantes/exemplo-7.jpg',
+        posicaoY: 55,
+        zoom: 115,
         categoria: 'servico',
         destaque: '',
         tipo: 'card',
@@ -61,6 +83,8 @@ export const anunciantesExemplo = [
         destaque: '',
         tipo: 'imagem',
         imagemUrl: '/anunciantes/exemplo-5.jpg',
+        posicaoY: 60,
+        zoom: 110,
         titulo: 'Sua próxima pescaria começa aqui',
         subtitulo: 'Roteiros guiados de pesca esportiva',
         whatsapp: '5511999990004',
