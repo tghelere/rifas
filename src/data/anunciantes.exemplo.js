@@ -1,5 +1,9 @@
 // Dados ilustrativos para testar visualmente os formatos do AdBanner (não usado em produção).
 // Mesma forma de item que `anunciantes.js` — ver comentário lá.
+//
+// Em dados reais, `foto` e `imagemUrl` devem apontar para caminhos dentro de
+// `public/anunciantes/` (ex: '/anunciantes/ocelos-pesca.jpg'), nunca URLs externas.
+// Aqui usamos SVGs embutidos como data URI só para não depender de arquivos externos neste exemplo.
 
 function svgParaDataUri(svg) {
     return `data:image/svg+xml,${encodeURIComponent(svg)}`

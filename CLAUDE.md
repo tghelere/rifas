@@ -606,7 +606,7 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
     id, nome, descricao,
     icone,     // classe do Bootstrap Icons (ex: 'bi-shop'), usada no bloco superior quando não há foto. Só usada quando tipo === 'card'.
     cor,       // string hex, cor de marca do anunciante (ex: '#0F6E56') — usada no bloco superior (fallback sem foto) e no botão de CTA. Só usada quando tipo === 'card'.
-    foto,      // opcional; caminho/URL de imagem de fundo do bloco superior. Se ausente, usa `cor` sólida + ícone centralizado em branco. Só usada quando tipo === 'card'.
+    foto,      // opcional; caminho de imagem de fundo do bloco superior. Se ausente, usa `cor` sólida + ícone centralizado em branco. Só usada quando tipo === 'card'.
     categoria, // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não afeta renderização
     destaque,  // opcional (string)
     tipo,      // 'card' ou 'imagem' (default 'card')
@@ -616,6 +616,8 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
 ```
 
 O campo `imagemMiniatura` **foi removido** (substituído pelo esquema `foto`/`cor` acima). Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
+
+**Imagens de anunciantes**: `foto` e `imagemUrl` devem apontar para caminhos dentro de `public/anunciantes/` (ex: `/anunciantes/ocelos-pesca.jpg`), **nunca URLs externas**. A pasta `public/anunciantes/` existe (com um `.gitkeep` para ficar versionada mesmo vazia) e não tem subpastas por cliente — os arquivos são nomeados pelo `id` do anunciante. Se o mesmo anunciante tiver foto de card **e** banner (`tipo: 'imagem'`), diferenciar o nome (ex: `ocelos-pesca.jpg` para a foto do card, `ocelos-pesca-banner.jpg` para o banner). Os dados de `anunciantes.exemplo.js` (seção acima) são exceção deliberada a essa regra — usam SVGs embutidos como data URI para não depender de arquivos externos.
 
 Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo` — 4 registros ilustrativos usados só para testar visualmente o componente durante o desenvolvimento: 3 do tipo `card` com cores bem distintas entre si (`#0F6E56` verde-petróleo, `#0D6EFD` azul, `#C1440E` terracota), sem `foto` (usam o fallback de cor sólida + ícone), e 1 do tipo `imagem` com banner horizontal. As imagens desses exemplos são SVGs embutidos como data URI (sem arquivos externos). **Não é importado em nenhum lugar do código de produção** (fora do modo demo) — é usado pela rota `/publicidade` (ver abaixo) e, para testes manuais adicionais, pode-se trocar temporariamente o import de `anunciantes` por `anunciantesExemplo` em `AdBanner.vue`.
 
@@ -628,7 +630,7 @@ Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo
 **Dois formatos de slide**:
 
 - **`tipo: 'card'`** (default): bloco superior de ~120px (foto de fundo se `foto` existir, senão `cor` sólida com o ícone centralizado em branco) com um pequeno rótulo "Publicidade" no canto — pequeno, não chamativo. Abaixo: nome, descrição (2 linhas), linha de destaque, e **um único botão de CTA**, com fundo na cor do anunciante e cor do texto escolhida automaticamente para contraste (preto ou branco, conforme a luminância da cor — função `corTextoContraste`). Para anunciante real: `ctaLabel`/`ctaHref` é "Visitar site" (se houver `site`) ou "Chamar no WhatsApp" (fallback via `wa.me`); para "vaga disponível": "Quero anunciar" → WhatsApp.
-- **`tipo: 'imagem'`**: renderiza `imagemUrl` inteira dentro de um único link (`object-fit: contain`), sem nenhum texto, cor, foto ou botão adicional — a arte do anunciante já é a identidade visual. O link vai para `site`, ou para o WhatsApp (`wa.me`) se não houver `site`. Não tem o rótulo "Publicidade" (mantido como já vinha, sem alteração nessa parte).
+- **`tipo: 'imagem'`**: renderiza `imagemUrl` dentro de um único link, preenchendo toda a largura e altura do bloco (`object-fit: cover` + `object-position: center` — corta levemente as bordas se a proporção da imagem não for exatamente a do bloco, em vez de deixar espaço em branco como fazia o `contain` anterior), sem nenhum texto, cor, foto ou botão adicional — a arte do anunciante já é a identidade visual. O link vai para `site`, ou para o WhatsApp (`wa.me`) se não houver `site`. Não tem o rótulo "Publicidade" (mantido como já vinha, sem alteração nessa parte).
 
 **Botão único de CTA (mudança de comportamento)**: antes cada slide `card` tinha dois botões (WhatsApp + Site/E-mail). Agora é um só. Consequência: o botão de E-mail do estado "vaga disponível" foi removido, e junto com ele o evento `abrir_email` (seção 9) deixou de ter qualquer disparo no código — só `abrir_whatsapp` continua ativo, disparado pelo CTA único do estado "vaga disponível" (cliques em anunciantes reais não emitem esse evento).
 
