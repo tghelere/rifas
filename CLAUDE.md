@@ -1023,7 +1023,7 @@ Não substituir o logo existente sem solicitação.
 
 Footer atual (`AppFooter.vue`): texto "Desenvolvido por" seguido da logo da Softhing (`public/softhing-fundo-escuro.svg`, versão para fundo escuro — o nome "Softhing" já está desenhado na logo, por isso não há texto duplicado do nome da marca).
 
-A logo linka para `https://www.softhing.com.br/`, com `target="_blank"` e `rel="noopener"`.
+A logo linka para `https://www.softhing.com.br/?utm_source=sortrifas&utm_medium=referral&utm_campaign=case_sortrifas` (com parâmetros UTM para rastreamento de referral), com `target="_blank"` e `rel="noopener"`.
 
 **Mudou** em relação a versões anteriores ("Developed by TGhelere" com link para o LinkedIn pessoal do desenvolvedor) — a atribuição pessoal foi substituída pela marca Softhing. Não reverter para a atribuição pessoal sem solicitação.
 

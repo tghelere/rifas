@@ -3,7 +3,7 @@
         <div class="container text-center text-light italic">
             <small>
                 Desenvolvido por
-                <a href="https://www.softhing.com.br/" title="Softhing" target="_blank" rel="noopener">
+                <a href="https://www.softhing.com.br/?utm_source=sortrifas&utm_medium=referral&utm_campaign=case_sortrifas" title="Softhing" target="_blank" rel="noopener">
                     <img src="/softhing-fundo-escuro.svg" alt="Softhing" class="softhing-logo">
                 </a>
             </small>
