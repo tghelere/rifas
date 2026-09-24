@@ -131,6 +131,7 @@ src/
     config.js                        # dados de contato do anúncio (via env vars)
     data/
         anunciantes.js               # array de anunciantes do AdBanner (hoje vazio, seção 16)
+        anunciantes.exemplo.js       # dados ilustrativos p/ testar o AdBanner visualmente (não usado em produção)
     composables/
         useRifaLogic.js              # todo o estado e a lógica de negócio da aplicação
     plugins/
@@ -599,7 +600,24 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
 
 `AdBanner.vue` deixou de ser um convite genérico estático e agora é um carrossel simples que exibe anunciantes reais em rodízio, com um estado padrão de "vaga disponível" quando não há nenhum anunciante ativo.
 
-**Fonte de dados**: `src/data/anunciantes.js`, exportando um array `anunciantes`. Cada item: `{ id, nome, descricao, icone (classe do Bootstrap Icons, ex: 'bi-shop'), destaque (string opcional, pode ser vazio), whatsapp (número), site (URL), ativo (boolean) }`. Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
+**Fonte de dados**: `src/data/anunciantes.js`, exportando um array `anunciantes`. Cada item:
+
+```js
+{
+    id, nome, descricao,
+    icone,             // classe do Bootstrap Icons (ex: 'bi-shop'), usada quando não há imagemMiniatura
+    imagemMiniatura,   // opcional; caminho/URL de imagem pequena que substitui o ícone
+    categoria,         // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não afeta renderização
+    destaque,          // opcional (string)
+    tipo,              // 'card' ou 'imagem' (default 'card')
+    imagemUrl,         // obrigatório só quando tipo === 'imagem'
+    whatsapp, site, ativo
+}
+```
+
+Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
+
+Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo` — 4 registros ilustrativos (um por combinação: categoria 'empresa' com ícone, categoria 'produto' com `imagemMiniatura` e `destaque`, categoria 'servico' com ícone, e um `tipo: 'imagem'` com banner horizontal) usados só para testar visualmente o componente durante o desenvolvimento. As imagens desses exemplos são SVGs embutidos como data URI (sem arquivos externos). **Não é importado em nenhum lugar do código-fonte** — para testar, trocar temporariamente o import de `anunciantes` por `anunciantesExemplo` em `AdBanner.vue` e reverter depois.
 
 **Regras de exibição** (`AdBanner.vue` filtra apenas os itens com `ativo: true`):
 
@@ -607,7 +625,12 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
 - **1 anunciante ativo**: mostra esse anunciante fixo, sem rodízio nem pontinhos.
 - **2+ anunciantes ativos**: a ordem da lista é embaralhada (Fisher-Yates) uma vez ao carregar o componente — não é sempre a mesma ordem a cada carregamento. Rodízio automático a cada 7 segundos com fade simples (`<transition name="fade" mode="out-in">`), com pontinhos indicativos de posição (apenas indicativo, sem clique).
 
-**Altura estável entre slides**: todo slide (incluindo o de "vaga disponível") usa exatamente a mesma estrutura de elementos, na mesma ordem — ícone, nome, descrição, linha de destaque, dois botões. A linha de destaque **sempre existe no DOM**, mesmo vazia; quando não há destaque, fica com `visibility: hidden` (nunca removida via `v-if`). A descrição é limitada a 2 linhas via `-webkit-line-clamp` com altura fixa em CSS (`height: 2.8em`), preenchendo o espaço mesmo com texto curto. Nada disso usa JavaScript para medir ou calcular alturas — é só CSS.
+**Dois formatos de slide**:
+
+- **`tipo: 'card'`** (default): ícone (ou `imagemMiniatura`, se preenchida, no lugar do ícone — mesma caixa de `2rem`), nome, descrição, linha de destaque, dois botões (WhatsApp + Site/E-mail). Comportamento igual ao descrito acima.
+- **`tipo: 'imagem'`**: renderiza `imagemUrl` inteira dentro de um único link (`object-fit: contain`), sem nenhum texto ou botão sobreposto. O link vai para `site`, ou para o WhatsApp (`wa.me`) se não houver `site`.
+
+**Altura estável entre slides**: todo slide (incluindo o de "vaga disponível" e o `tipo: 'imagem'`) fica dentro do mesmo wrapper `.slide-body`, com **altura fixa em CSS (`height: 263px`)** — o mesmo valor para os dois formatos, então trocar entre um card e uma imagem no rodízio não muda a altura do bloco. Dentro do formato `card`, a linha de destaque **sempre existe no DOM**, mesmo vazia; quando não há destaque, fica com `visibility: hidden` (nunca removida via `v-if`), e a descrição é limitada a 2 linhas via `-webkit-line-clamp` com altura fixa (`height: 2.8em`). Nada disso usa JavaScript para medir ou calcular alturas — é só CSS. O valor `263px` foi medido empiricamente (conteúdo real do formato `card` em um navegador) e não deve ser alterado sem novo teste visual, já que qualquer mudança nos elementos internos do card pode exigir recalcular esse número.
 
 **Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`), ocupando a largura inteira do container, sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
 
