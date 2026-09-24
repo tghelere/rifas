@@ -1,6 +1,6 @@
 <template>
     <div v-if="visible" class="card border-1 mb-3">
-        <div class="card-body p-0 pb-3 text-center">
+        <div class="card-body p-0 text-center">
             <div
                 id="ad-carousel"
                 ref="carouselRef"
@@ -14,12 +14,12 @@
                     <div v-for="(slide, idx) in slides" :key="slide.id" :class="['carousel-item', { active: idx === 0 }]">
                         <div class="slide-body">
                             <div v-if="slide.tipo === 'imagem'" class="slide-image-bg">
-                                <div class="slide-image-img" :style="imagemImgStyle(slide)"></div>
+                                <div class="slide-image-img" :style="imagemEstiloFundo(slide)"></div>
                                 <template v-if="slide.temOverlayImagem">
                                     <div class="slide-image-overlay"></div>
                                     <div class="slide-image-content">
-                                        <h5 v-if="slide.titulo" class="slide-image-titulo mb-1">{{ slide.titulo }}</h5>
-                                        <p v-if="slide.subtitulo" class="slide-image-subtitulo mb-2">{{ slide.subtitulo }}</p>
+                                        <h5 v-if="slide.nome" class="slide-image-nome mb-1">{{ slide.nome }}</h5>
+                                        <p v-if="slide.descricao" class="slide-image-descricao mb-2">{{ slide.descricao }}</p>
                                         <div v-if="slide.botoes.length" class="d-flex justify-content-center gap-2 flex-wrap">
                                             <a
                                                 v-for="(btn, bi) in slide.botoes"
@@ -41,8 +41,8 @@
                             </div>
                             <template v-else>
                                 <div class="slide-photo" :style="{ backgroundColor: slide.cor || COR_PADRAO }">
-                                    <div v-if="slide.foto" class="slide-photo-img" :style="fotoImgStyle(slide)"></div>
-                                    <div v-if="slide.foto" class="slide-photo-gradient" :style="gradienteStyle(slide)"></div>
+                                    <div v-if="slide.imagem" class="slide-photo-img" :style="imagemEstiloFundo(slide)"></div>
+                                    <div v-if="slide.imagem" class="slide-photo-gradient" :style="gradienteStyle(slide)"></div>
                                     <span class="ad-label">Publicidade</span>
                                     <i v-if="slide.isVaga" :class="['bi', slide.icone, 'slide-photo-icon']"></i>
                                 </div>
@@ -156,12 +156,9 @@ const slides = isVagaDisponivel
               descricao: 'Anuncie seu produto ou serviço para quem usa esta ferramenta',
               icone: 'bi-megaphone',
               cor: COR_PADRAO,
-              foto: '',
+              imagem: '',
               destaque: '',
               botoes: [{ href: props.whatsappLink, label: 'Quero anunciar', icon: 'bi-whatsapp' }],
-              imagemUrl: '',
-              titulo: '',
-              subtitulo: '',
               temOverlayImagem: false,
               linkHref: ''
           }
@@ -172,59 +169,53 @@ const slides = isVagaDisponivel
               id: a.id,
               tipo: a.tipo || 'card',
               isVaga: false,
-              nome: a.nome,
-              descricao: a.descricao,
-              icone: a.icone,
+              nome: a.nome || '',
+              descricao: a.descricao || '',
               cor: a.cor || COR_PADRAO,
-              foto: a.foto || '',
+              imagem: a.imagem || '',
+              posicaoX: a.posicaoX,
               posicaoY: a.posicaoY,
               zoom: a.zoom,
               destaque: a.destaque || '',
               botoes,
-              imagemUrl: a.imagemUrl || '',
-              titulo: a.titulo || '',
-              subtitulo: a.subtitulo || '',
-              temOverlayImagem: !!(a.titulo || a.subtitulo || botoes.length),
+              temOverlayImagem: !!(a.nome || a.descricao || botoes.length),
               linkHref: a.site || (a.whatsapp ? `https://wa.me/${a.whatsapp}` : '')
           }
       })
 
-function clampPosicaoY(valor) {
+function clampEixo(valor) {
     const n = Number(valor)
-    if (Number.isNaN(n)) return 50
-    return Math.min(100, Math.max(0, n))
+    const base = Number.isNaN(n) ? 0 : n
+    return Math.min(100, Math.max(0, 50 + base))
 }
 
 function clampZoom(valor) {
     const n = Number(valor)
-    if (Number.isNaN(n)) return 100
-    return Math.max(100, n)
+    if (Number.isNaN(n) || n < 0) return 0
+    return n
 }
 
-function estiloEnquadramento(url, posicaoY, zoom) {
-    const posY = clampPosicaoY(posicaoY)
-    const z = clampZoom(zoom)
+function estiloEnquadramento(url, posicaoX, posicaoY, zoom) {
+    const posX = clampEixo(posicaoX)
+    const posY = clampEixo(posicaoY)
+    const escala = 1 + clampZoom(zoom) / 100
     return {
         backgroundImage: `url(${url})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: `center ${posY}%`,
-        transform: `scale(${z / 100})`,
-        transformOrigin: `center ${posY}%`
+        backgroundPosition: `${posX}% ${posY}%`,
+        transform: `scale(${escala})`,
+        transformOrigin: `${posX}% ${posY}%`
     }
 }
 
-function fotoImgStyle(slide) {
-    return estiloEnquadramento(slide.foto, slide.posicaoY, slide.zoom)
+function imagemEstiloFundo(slide) {
+    return estiloEnquadramento(slide.imagem, slide.posicaoX, slide.posicaoY, slide.zoom)
 }
 
 function gradienteStyle(slide) {
     const cor = slide.cor || COR_PADRAO
     return { background: `linear-gradient(to right, ${cor} 0%, transparent 25%, transparent 75%, ${cor} 100%)` }
-}
-
-function imagemImgStyle(slide) {
-    return estiloEnquadramento(slide.imagemUrl, slide.posicaoY, slide.zoom)
 }
 
 function ctaStyle(slide) {
@@ -433,11 +424,11 @@ function onPointerCancel() {
     color: #ffffff;
 }
 
-.slide-image-titulo {
+.slide-image-nome {
     font-weight: 700;
 }
 
-.slide-image-subtitulo {
+.slide-image-descricao {
     font-size: 0.85em;
     opacity: 0.9;
 }

@@ -1,20 +1,43 @@
 // cada item de `anunciantes`:
 // {
-//   id, nome, descricao,
-//   icone,     // classe do Bootstrap Icons (ex: 'bi-shop'), usada no bloco superior quando não há foto. Só usada no slide de "vaga disponível" — anunciantes reais sem foto não mostram ícone, só a cor sólida.
-//   cor,       // string hex, cor de marca do anunciante (ex: '#0F6E56') — usada no bloco superior (fallback sem foto, e como degradê nas bordas quando há foto) e nos botões de CTA. Usada tanto em tipo === 'card' quanto em tipo === 'imagem' (quando há botões/título/subtítulo sobrepostos).
-//   foto,      // opcional; caminho de imagem de fundo do bloco superior (cobre o bloco inteiro, com degradê da `cor` nas bordas). Se ausente, usa `cor` sólida, sem ícone. Só usada quando tipo === 'card'.
-//   categoria, // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não afeta renderização
-//   destaque,  // opcional (string)
-//   tipo,      // 'card' ou 'imagem' (default 'card')
-//   imagemUrl, // obrigatório só quando tipo === 'imagem'; imagem de fundo cobrindo o bloco inteiro
-//   titulo,    // opcional; só usado quando tipo === 'imagem' — sobreposto na imagem (com degradê escuro por trás para legibilidade)
-//   subtitulo, // opcional; só usado quando tipo === 'imagem' — sobreposto abaixo do título
-//   posicaoY,  // opcional (número 0-100, padrão 50); aplica-se a `foto` OU `imagemUrl`. 0 = topo da imagem, 50 = centralizado (padrão), 100 = base. Controla o enquadramento vertical (background-position) e também é o ponto de origem do `zoom` abaixo.
-//   zoom,      // opcional (número, padrão 100, mínimo 100); aplica-se a `foto` OU `imagemUrl`. 100 = sem zoom extra (comportamento padrão, só o cover mínimo). Ex: 130 = amplia 30% além do cover, em torno do ponto definido por `posicaoY`.
-//   whatsapp, site, ativo
+//   id,         // string, identificador único do anunciante
+//   nome,       // string. Tipo 'card': sempre exibido. Tipo 'imagem': sobreposto na imagem
+//               //   (com degradê escuro por trás) só se `nome`, `descricao` ou algum botão
+//               //   (whatsapp/site) estiver preenchido — se nenhum dos três, a imagem vira
+//               //   um único link clicável sem nenhum texto/cor sobreposta.
+//   descricao,  // string. Mesma regra de exibição do `nome`, em ambos os tipos.
+//   cor,        // string hex (ex: '#0F6E56'), cor de marca. Tipo 'card': fundo do bloco
+//               //   superior quando não há `imagem` (sólido, sem ícone), ou degradê nas
+//               //   bordas esquerda/direita quando há `imagem`. Usada nos dois tipos como
+//               //   cor de fundo dos botões de CTA (whatsapp/site).
+//   imagem,     // caminho dentro de public/anunciantes/ (ex: '/anunciantes/loja.jpg'),
+//               //   nunca URL externa. Tipo 'card': opcional (sem ela, usa `cor` sólida,
+//               //   sem ícone). Tipo 'imagem': obrigatória, cobre o bloco inteiro.
+//   categoria,  // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não
+//               //   afeta renderização em nenhum tipo.
+//   destaque,   // opcional (string). Só lido no tipo 'card' (linha de destaque abaixo da
+//               //   descrição). Não tem efeito no tipo 'imagem' — não incluir nesse caso.
+//   tipo,       // 'card' ou 'imagem' (default 'card')
+//   posicaoX,   // opcional (número, padrão 0). Desloca o enquadramento horizontal de
+//               //   `imagem`: 0 = centralizado, negativo = mostra mais a ESQUERDA,
+//               //   positivo = mostra mais a DIREITA. Convertido internamente para
+//               //   background-position em % via `50 + posicaoX` (limitado a 0-100).
+//   posicaoY,   // opcional (número, padrão 0). Mesma lógica de `posicaoX`, no eixo
+//               //   vertical: negativo = mostra mais a parte de CIMA da imagem,
+//               //   positivo = mostra mais a parte de BAIXO. `50 + posicaoY` (0-100).
+//   zoom,       // opcional (número >= 0, padrão 0). 0 = sem zoom adicional (só o
+//               //   preenchimento mínimo de cover). Não aceita valores negativos (abaixo
+//               //   do cover mínimo deixaria espaço em branco, o que nunca é permitido).
+//               //   Escala aplicada = 1 + (zoom / 100), ampliando em torno do ponto
+//               //   definido por `posicaoX`/`posicaoY`.
+//   whatsapp,   // opcional (string, só dígitos, com DDI). Presente em ambos os tipos →
+//               //   mostra o botão "WhatsApp" (link https://wa.me/<whatsapp>).
+//   site,       // opcional (string, URL completa). Presente em ambos os tipos → mostra o
+//               //   botão "Visitar site".
+//   ativo       // boolean. Só anunciantes com ativo === true entram no carrossel.
 // }
 //
-// `foto` e `imagemUrl` devem apontar para caminhos dentro de `public/anunciantes/`
-// (ex: '/anunciantes/ocelos-pesca.jpg'), nunca URLs externas.
+// O campo `icone` NÃO existe nesse array: é usado só internamente pelo AdBanner.vue para o
+// slide fixo de "vaga disponível" (quando este array está vazio ou sem nenhum item ativo),
+// e não é lido de nenhum registro de anunciante real — não incluir esse campo aqui.
 export const anunciantes = []
