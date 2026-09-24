@@ -1,79 +1,89 @@
 <template>
     <div v-if="visible" class="card border-1 mb-3">
-        <div class="card-body text-center">
-            <transition name="fade" mode="out-in">
-                <div :key="currentSlide.id" class="slide-body">
-                    <a
-                        v-if="currentSlide.tipo === 'imagem'"
-                        class="slide-image-link"
-                        :href="currentSlide.linkHref"
-                        target="_blank"
-                        rel="noopener"
-                        :title="currentSlide.nome || 'Anúncio'"
-                    >
-                        <img :src="currentSlide.imagemUrl" :alt="currentSlide.nome || 'Anúncio'" class="slide-image" />
-                    </a>
-                    <template v-else>
-                        <div class="slide-icon-box">
-                            <img v-if="currentSlide.imagemMiniatura" :src="currentSlide.imagemMiniatura" alt="" class="slide-thumb" />
-                            <i v-else :class="['bi', currentSlide.icone, 'slide-icon', 'text-success']"></i>
+        <div class="card-body p-0 pb-3 text-center">
+            <div id="ad-carousel" ref="carouselRef" class="carousel slide carousel-fade">
+                <div class="carousel-inner">
+                    <div v-for="(slide, idx) in slides" :key="slide.id" :class="['carousel-item', { active: idx === 0 }]">
+                        <div class="slide-body">
+                            <a
+                                v-if="slide.tipo === 'imagem'"
+                                class="slide-image-link"
+                                :href="slide.linkHref"
+                                target="_blank"
+                                rel="noopener"
+                                :title="slide.nome || 'Anúncio'"
+                            >
+                                <img :src="slide.imagemUrl" :alt="slide.nome || 'Anúncio'" class="slide-image" />
+                            </a>
+                            <template v-else>
+                                <div class="slide-photo" :style="fotoStyle(slide)">
+                                    <span class="ad-label">Publicidade</span>
+                                    <i v-if="!slide.foto" :class="['bi', slide.icone, 'slide-photo-icon']"></i>
+                                </div>
+                                <div class="slide-info px-3 pt-2">
+                                    <h5 class="mb-1 text-truncate">{{ slide.nome }}</h5>
+                                    <p class="text-muted small descricao-clamp mb-1">{{ slide.descricao }}</p>
+                                    <p class="small text-success destaque-line mb-2" :style="{ visibility: slide.destaque ? 'visible' : 'hidden' }">
+                                        {{ slide.destaque || '.' }}
+                                    </p>
+                                    <a
+                                        class="btn btn-sm w-100 d-flex justify-content-center align-items-center gap-2"
+                                        :style="ctaStyle(slide)"
+                                        :href="slide.ctaHref"
+                                        target="_blank"
+                                        rel="noopener"
+                                        :title="slide.ctaLabel"
+                                        @click="onCtaClick"
+                                    >
+                                        <i :class="['bi', slide.ctaIcon]"></i> {{ slide.ctaLabel }}
+                                    </a>
+                                </div>
+                            </template>
                         </div>
-                        <h5 class="mt-2 mb-1 text-truncate">{{ currentSlide.nome }}</h5>
-                        <p class="text-muted small descricao-clamp mb-1">{{ currentSlide.descricao }}</p>
-                        <p class="small text-success destaque-line mb-2" :style="{ visibility: currentSlide.destaque ? 'visible' : 'hidden' }">
-                            {{ currentSlide.destaque || '.' }}
-                        </p>
-                        <div class="row g-2 justify-content-center">
-                            <div class="col-12 col-md-2">
-                                <a
-                                    class="btn btn-sm btn-success w-100 d-flex justify-content-center align-items-center gap-2"
-                                    :href="currentSlide.whatsappHref"
-                                    target="_blank"
-                                    rel="noopener"
-                                    title="Entrar em contato pelo WhatsApp"
-                                    @click="onWhatsappClick"
-                                >
-                                    <i class="bi bi-whatsapp"></i> WhatsApp
-                                </a>
-                            </div>
-                            <div class="col-12 col-md-2">
-                                <a
-                                    class="btn btn-sm btn-dark w-100 d-flex justify-content-center align-items-center gap-2"
-                                    :href="currentSlide.secondHref"
-                                    target="_blank"
-                                    rel="noopener"
-                                    :title="currentSlide.secondLabel"
-                                    @click="onSecondClick"
-                                >
-                                    <i :class="['bi', currentSlide.secondIcon]"></i> {{ currentSlide.secondLabel }}
-                                </a>
-                            </div>
-                        </div>
-                    </template>
+                    </div>
                 </div>
-            </transition>
-            <div v-if="slides.length > 1" class="dots mt-3 d-flex justify-content-center gap-2">
-                <span v-for="(slide, idx) in slides" :key="slide.id" class="dot" :class="{ active: idx === currentIndex }"></span>
+                <div v-if="slides.length > 1" class="carousel-indicators">
+                    <button
+                        v-for="(slide, idx) in slides"
+                        :key="slide.id"
+                        type="button"
+                        data-bs-target="#ad-carousel"
+                        :data-bs-slide-to="idx"
+                        :class="{ active: idx === 0 }"
+                        :aria-label="`Anunciante ${idx + 1}`"
+                    ></button>
+                </div>
+                <template v-if="slides.length > 1">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#ad-carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#ad-carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted, watch, nextTick } from 'vue'
+import { Carousel } from 'bootstrap'
 import { anunciantes } from '../data/anunciantes.js'
 import { anunciantesExemplo } from '../data/anunciantes.exemplo.js'
 
 const ROTATION_INTERVAL = 7000
+const COR_PADRAO = '#198754'
 
 const props = defineProps({
     visible: Boolean,
     modoDemo: Boolean,
-    whatsappLink: String,
-    emailLink: String
+    whatsappLink: String
 })
 
-const emit = defineEmits(['contactWhatsapp', 'contactEmail'])
+const emit = defineEmits(['contactWhatsapp'])
 
 function embaralhar(array) {
     const resultado = [...array]
@@ -82,6 +92,16 @@ function embaralhar(array) {
         ;[resultado[i], resultado[j]] = [resultado[j], resultado[i]]
     }
     return resultado
+}
+
+function corTextoContraste(hex) {
+    if (!hex) return '#ffffff'
+    const h = hex.replace('#', '')
+    const r = parseInt(h.substring(0, 2), 16)
+    const g = parseInt(h.substring(2, 4), 16)
+    const b = parseInt(h.substring(4, 6), 16)
+    const luminancia = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+    return luminancia > 0.6 ? '#212529' : '#ffffff'
 }
 
 const listaAnunciantes = props.modoDemo ? anunciantesExemplo : anunciantes
@@ -96,12 +116,12 @@ const slides = isVagaDisponivel
               nome: 'Sua empresa aqui',
               descricao: 'Anuncie seu produto ou serviço para quem usa esta ferramenta',
               icone: 'bi-megaphone',
-              imagemMiniatura: '',
+              cor: COR_PADRAO,
+              foto: '',
               destaque: '',
-              whatsappHref: props.whatsappLink,
-              secondHref: props.emailLink,
-              secondLabel: 'E-mail',
-              secondIcon: 'bi-envelope-at',
+              ctaHref: props.whatsappLink,
+              ctaLabel: 'Quero anunciar',
+              ctaIcon: 'bi-whatsapp',
               imagemUrl: '',
               linkHref: ''
           }
@@ -112,64 +132,100 @@ const slides = isVagaDisponivel
           nome: a.nome,
           descricao: a.descricao,
           icone: a.icone,
-          imagemMiniatura: a.imagemMiniatura || '',
+          cor: a.cor || COR_PADRAO,
+          foto: a.foto || '',
           destaque: a.destaque || '',
-          whatsappHref: a.whatsapp ? `https://wa.me/${a.whatsapp}` : '',
-          secondHref: a.site || '',
-          secondLabel: 'Site',
-          secondIcon: 'bi-box-arrow-up-right',
+          ctaHref: a.site || (a.whatsapp ? `https://wa.me/${a.whatsapp}` : ''),
+          ctaLabel: a.site ? 'Visitar site' : 'Chamar no WhatsApp',
+          ctaIcon: a.site ? 'bi-box-arrow-up-right' : 'bi-whatsapp',
           imagemUrl: a.imagemUrl || '',
           linkHref: a.site || (a.whatsapp ? `https://wa.me/${a.whatsapp}` : '')
       }))
 
-const currentIndex = ref(0)
-const currentSlide = computed(() => slides[currentIndex.value])
-
-let intervalId = null
-
-onMounted(() => {
-    if (slides.length > 1) {
-        intervalId = setInterval(() => {
-            currentIndex.value = (currentIndex.value + 1) % slides.length
-        }, ROTATION_INTERVAL)
+function fotoStyle(slide) {
+    if (slide.foto) {
+        return { backgroundImage: `url(${slide.foto})`, backgroundSize: 'cover', backgroundPosition: 'center' }
     }
-})
-
-onUnmounted(() => {
-    if (intervalId) clearInterval(intervalId)
-})
-
-function onWhatsappClick() {
-    if (isVagaDisponivel) emit('contactWhatsapp')
+    return { backgroundColor: slide.cor || COR_PADRAO }
 }
 
-function onSecondClick() {
-    if (isVagaDisponivel) emit('contactEmail')
+function ctaStyle(slide) {
+    const cor = slide.cor || COR_PADRAO
+    return { backgroundColor: cor, borderColor: cor, color: corTextoContraste(cor) }
+}
+
+const carouselRef = ref(null)
+let carouselInstance = null
+
+function iniciarCarousel() {
+    if (slides.length > 1 && carouselRef.value && !carouselInstance) {
+        carouselInstance = new Carousel(carouselRef.value, {
+            interval: ROTATION_INTERVAL,
+            ride: 'carousel',
+            pause: 'hover',
+            touch: true,
+            wrap: true
+        })
+    }
+}
+
+function pararCarousel() {
+    if (carouselInstance) {
+        carouselInstance.dispose()
+        carouselInstance = null
+    }
+}
+
+watch(
+    () => props.visible,
+    async (visivel) => {
+        if (visivel) {
+            await nextTick()
+            iniciarCarousel()
+        } else {
+            pararCarousel()
+        }
+    },
+    { immediate: true }
+)
+
+onUnmounted(() => {
+    pararCarousel()
+})
+
+function onCtaClick() {
+    if (isVagaDisponivel) emit('contactWhatsapp')
 }
 </script>
 
 <style scoped lang="scss">
 .slide-body {
-    height: 263px;
+    height: 260px;
 }
 
-.slide-icon-box {
-    height: 2rem;
+.slide-photo {
+    position: relative;
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.slide-icon {
-    font-size: 1.5rem;
+.slide-photo-icon {
+    color: #ffffff;
+    font-size: 2rem;
 }
 
-.slide-thumb {
-    height: 100%;
-    width: auto;
-    max-width: 2rem;
-    object-fit: contain;
+.ad-label {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 1px 6px;
     border-radius: 4px;
+    letter-spacing: 0.02em;
 }
 
 .slide-image-link {
@@ -201,25 +257,30 @@ function onSecondClick() {
     text-overflow: ellipsis;
 }
 
-.dot {
+.carousel-indicators {
+    position: static;
+    margin: 0.5rem 0 0;
+}
+
+.carousel-indicators [data-bs-target] {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #ced4da;
-    transition: background-color 0.3s ease;
+    border: 0;
+    opacity: 0.5;
+    background-color: #adb5bd;
+    margin: 0 4px;
 
     &.active {
+        opacity: 1;
         background-color: #198754;
     }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.4s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
+.carousel-control-prev,
+.carousel-control-next {
+    top: 0;
+    bottom: auto;
+    height: 120px;
 }
 </style>

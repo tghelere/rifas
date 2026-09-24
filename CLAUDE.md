@@ -182,7 +182,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { setupAnalytics } from './plugins/gtag.js'
 import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap/dist/js/bootstrap.js'
+import 'bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import './assets/styles/main.scss'
 
@@ -192,6 +192,8 @@ setupAnalytics(app)
 
 app.mount('#app')
 ```
+
+**Import do JS do Bootstrap**: `import 'bootstrap'` (build ESM, `bootstrap/dist/js/bootstrap.esm.js`), não mais `import 'bootstrap/dist/js/bootstrap.js'` (build UMD). Mudou porque `AdBanner.vue` (seção 16) importa a classe `Carousel` via `import { Carousel } from 'bootstrap'` para controlar o carrossel de anúncios programaticamente; usar builds diferentes (UMD em `main.js` + ESM em `AdBanner.vue`) fazia o Vite empacotar o Bootstrap JS duas vezes (bundle ~240 KB em vez de ~178 KB). Mesma versão do Bootstrap, mesmo comportamento — só o formato do módulo mudou, para permitir deduplicação.
 
 ## Problema histórico (resolvido)
 
@@ -307,10 +309,11 @@ compartilhar_todos_nao_pagos
 incrementar_quantidade
 decrementar_quantidade
 abrir_whatsapp
-abrir_email
 ```
 
 A intenção é medir interações reais da aplicação, sem excesso (ver seção 69).
+
+**`abrir_email` foi removido** (seção 16): o `AdBanner` passou a ter um único botão de CTA por slide em vez de dois (WhatsApp + E-mail), então não há mais um clique de "E-mail" para disparar esse evento. `config.emailAddress`/`emailSubject` continuam em `config.js` (não alterado), mas hoje não são lidos por nenhum componente.
 
 ---
 
@@ -488,17 +491,13 @@ registrarEvento('decrementar_quantidade', {
 
 ## WhatsApp (anúncio)
 
-Disparado em `App.vue`, não no composable:
+Disparado em `App.vue`, não no composable. Único evento de clique do `AdBanner` (seção 16) — dispara apenas no botão de CTA do estado "vaga disponível", nunca em cliques de anunciantes reais:
 
 ```vue
 @contactWhatsapp="registrarEvento('abrir_whatsapp', { event_category: 'Anúncio', event_label: 'Clique em WhatsApp' })"
 ```
 
-## E-mail (anúncio)
-
-```vue
-@contactEmail="registrarEvento('abrir_email', { event_category: 'Anúncio', event_label: 'Clique em E-mail' })"
-```
+**Não existe mais `abrir_email`** (ver seção 9) — o `AdBanner` tinha dois botões (WhatsApp + E-mail) e passou a ter um único CTA por slide.
 
 ---
 
@@ -598,45 +597,52 @@ Não duplicar ou expor os valores reais de `.env` em documentação externa. Pre
 
 ## AdBanner: carrossel de anunciantes com estado de "vaga disponível"
 
-`AdBanner.vue` deixou de ser um convite genérico estático e agora é um carrossel simples que exibe anunciantes reais em rodízio, com um estado padrão de "vaga disponível" quando não há nenhum anunciante ativo.
+`AdBanner.vue` é um carrossel que exibe anunciantes reais em rodízio, com um estado padrão de "vaga disponível" quando não há nenhum anunciante ativo. A partir de uma revisão de visual/navegação, o carrossel usa o **componente Carousel nativo do Bootstrap 5** (não mais `setInterval` + fade escritos manualmente), e cada slide `card` ganhou um bloco de identidade visual por anunciante (foto ou cor de marca).
 
 **Fonte de dados**: `src/data/anunciantes.js`, exportando um array `anunciantes`. Cada item:
 
 ```js
 {
     id, nome, descricao,
-    icone,             // classe do Bootstrap Icons (ex: 'bi-shop'), usada quando não há imagemMiniatura
-    imagemMiniatura,   // opcional; caminho/URL de imagem pequena que substitui o ícone
-    categoria,         // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não afeta renderização
-    destaque,          // opcional (string)
-    tipo,              // 'card' ou 'imagem' (default 'card')
-    imagemUrl,         // obrigatório só quando tipo === 'imagem'
+    icone,     // classe do Bootstrap Icons (ex: 'bi-shop'), usada no bloco superior quando não há foto. Só usada quando tipo === 'card'.
+    cor,       // string hex, cor de marca do anunciante (ex: '#0F6E56') — usada no bloco superior (fallback sem foto) e no botão de CTA. Só usada quando tipo === 'card'.
+    foto,      // opcional; caminho/URL de imagem de fundo do bloco superior. Se ausente, usa `cor` sólida + ícone centralizado em branco. Só usada quando tipo === 'card'.
+    categoria, // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não afeta renderização
+    destaque,  // opcional (string)
+    tipo,      // 'card' ou 'imagem' (default 'card')
+    imagemUrl, // obrigatório só quando tipo === 'imagem'
     whatsapp, site, ativo
 }
 ```
 
-Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
+O campo `imagemMiniatura` **foi removido** (substituído pelo esquema `foto`/`cor` acima). Hoje o array está **vazio** — nenhum anunciante real cadastrado ainda.
 
-Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo` — 4 registros ilustrativos (um por combinação: categoria 'empresa' com ícone, categoria 'produto' com `imagemMiniatura` e `destaque`, categoria 'servico' com ícone, e um `tipo: 'imagem'` com banner horizontal) usados só para testar visualmente o componente durante o desenvolvimento. As imagens desses exemplos são SVGs embutidos como data URI (sem arquivos externos). **Não é importado em nenhum lugar do código-fonte** — para testar, trocar temporariamente o import de `anunciantes` por `anunciantesExemplo` em `AdBanner.vue` e reverter depois.
+Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo` — 4 registros ilustrativos usados só para testar visualmente o componente durante o desenvolvimento: 3 do tipo `card` com cores bem distintas entre si (`#0F6E56` verde-petróleo, `#0D6EFD` azul, `#C1440E` terracota), sem `foto` (usam o fallback de cor sólida + ícone), e 1 do tipo `imagem` com banner horizontal. As imagens desses exemplos são SVGs embutidos como data URI (sem arquivos externos). **Não é importado em nenhum lugar do código de produção** (fora do modo demo) — é usado pela rota `/publicidade` (ver abaixo) e, para testes manuais adicionais, pode-se trocar temporariamente o import de `anunciantes` por `anunciantesExemplo` em `AdBanner.vue`.
 
 **Regras de exibição** (`AdBanner.vue` filtra apenas os itens com `ativo: true`):
 
-- **0 anunciantes ativos** (caso atual, array vazio): mostra um único slide fixo de "vaga disponível" — nome "Sua empresa aqui", descrição "Anuncie seu produto ou serviço para quem usa esta ferramenta", sem linha de destaque, com os dois botões apontando para o WhatsApp/e-mail de `config.js` (`whatsappLink`/`emailLink`, os mesmos usados historicamente pelo AdBanner) — nunca para uma empresa inventada.
-- **1 anunciante ativo**: mostra esse anunciante fixo, sem rodízio nem pontinhos.
-- **2+ anunciantes ativos**: a ordem da lista é embaralhada (Fisher-Yates) uma vez ao carregar o componente — não é sempre a mesma ordem a cada carregamento. Rodízio automático a cada 7 segundos com fade simples (`<transition name="fade" mode="out-in">`), com pontinhos indicativos de posição (apenas indicativo, sem clique).
+- **0 anunciantes ativos** (caso atual, array vazio): mostra um único slide fixo de "vaga disponível" — nome "Sua empresa aqui", descrição "Anuncie seu produto ou serviço para quem usa esta ferramenta", sem destaque, cor padrão verde (`#198754`), e um único CTA "Quero anunciar" apontando para o WhatsApp de `config.js` (`whatsappLink`) — nunca para uma empresa inventada.
+- **1 anunciante ativo**: mostra esse anunciante fixo, sem setas nem indicadores (mesmo comportamento de antes).
+- **2+ anunciantes ativos**: a ordem da lista é embaralhada (Fisher-Yates) uma vez por carregamento do componente — não é sempre a mesma ordem a cada carregamento (ver nota sobre timing abaixo). Setas de navegação (anterior/próximo) e indicadores (pontinhos) ficam visíveis.
 
 **Dois formatos de slide**:
 
-- **`tipo: 'card'`** (default): ícone (ou `imagemMiniatura`, se preenchida, no lugar do ícone — mesma caixa de `2rem`), nome, descrição, linha de destaque, dois botões (WhatsApp + Site/E-mail). Comportamento igual ao descrito acima.
-- **`tipo: 'imagem'`**: renderiza `imagemUrl` inteira dentro de um único link (`object-fit: contain`), sem nenhum texto ou botão sobreposto. O link vai para `site`, ou para o WhatsApp (`wa.me`) se não houver `site`.
+- **`tipo: 'card'`** (default): bloco superior de ~120px (foto de fundo se `foto` existir, senão `cor` sólida com o ícone centralizado em branco) com um pequeno rótulo "Publicidade" no canto — pequeno, não chamativo. Abaixo: nome, descrição (2 linhas), linha de destaque, e **um único botão de CTA**, com fundo na cor do anunciante e cor do texto escolhida automaticamente para contraste (preto ou branco, conforme a luminância da cor — função `corTextoContraste`). Para anunciante real: `ctaLabel`/`ctaHref` é "Visitar site" (se houver `site`) ou "Chamar no WhatsApp" (fallback via `wa.me`); para "vaga disponível": "Quero anunciar" → WhatsApp.
+- **`tipo: 'imagem'`**: renderiza `imagemUrl` inteira dentro de um único link (`object-fit: contain`), sem nenhum texto, cor, foto ou botão adicional — a arte do anunciante já é a identidade visual. O link vai para `site`, ou para o WhatsApp (`wa.me`) se não houver `site`. Não tem o rótulo "Publicidade" (mantido como já vinha, sem alteração nessa parte).
 
-**Altura estável entre slides**: todo slide (incluindo o de "vaga disponível" e o `tipo: 'imagem'`) fica dentro do mesmo wrapper `.slide-body`, com **altura fixa em CSS (`height: 263px`)** — o mesmo valor para os dois formatos, então trocar entre um card e uma imagem no rodízio não muda a altura do bloco. Dentro do formato `card`, a linha de destaque **sempre existe no DOM**, mesmo vazia; quando não há destaque, fica com `visibility: hidden` (nunca removida via `v-if`), e a descrição é limitada a 2 linhas via `-webkit-line-clamp` com altura fixa (`height: 2.8em`). Nada disso usa JavaScript para medir ou calcular alturas — é só CSS. O valor `263px` foi medido empiricamente (conteúdo real do formato `card` em um navegador) e não deve ser alterado sem novo teste visual, já que qualquer mudança nos elementos internos do card pode exigir recalcular esse número.
+**Botão único de CTA (mudança de comportamento)**: antes cada slide `card` tinha dois botões (WhatsApp + Site/E-mail). Agora é um só. Consequência: o botão de E-mail do estado "vaga disponível" foi removido, e junto com ele o evento `abrir_email` (seção 9) deixou de ter qualquer disparo no código — só `abrir_whatsapp` continua ativo, disparado pelo CTA único do estado "vaga disponível" (cliques em anunciantes reais não emitem esse evento).
 
-**Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`), ocupando a largura inteira do container, sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
+**Altura estável entre slides**: todo slide (incluindo o de "vaga disponível" e o `tipo: 'imagem'`) fica dentro do mesmo wrapper `.slide-body`, com **altura fixa em CSS (`height: 260px`)** — o mesmo valor para os dois formatos, então trocar de slide no rodízio não muda a altura do bloco. Dentro do formato `card`, a linha de destaque **sempre existe no DOM**, mesmo vazia; quando não há destaque, fica com `visibility: hidden` (nunca removida via `v-if`), e a descrição é limitada a 2 linhas via `-webkit-line-clamp` com altura fixa (`height: 2.8em`). Nada disso usa JavaScript para medir ou calcular alturas — é só CSS. O valor `260px` foi medido empiricamente (conteúdo real do formato `card`, sem altura fixa, em um navegador) e não deve ser alterado sem novo teste visual.
 
-**Condição de visibilidade (preservada da versão anterior ao carrossel)**: o `AdBanner` — seja mostrando um anunciante real, seja mostrando o card de "vaga disponível" — só aparece quando `numerosDisponiveis.length > 0` **e** (`config.exibirAd` é `true` **ou** está em modo demo — ver abaixo), exatamente como antes da reescrita, exceto pela exceção do modo demo. `App.vue` passa `:visible="numerosDisponiveis.length > 0 && (modoDemo || config.exibirAd)"` para o componente, que envolve o card inteiro em `v-if="visible"`. Ou seja: mesmo com anunciantes cadastrados e ativos, o bloco só aparece depois de uma busca de "disponíveis" bem-sucedida, e nunca aparece se `config.exibirAd` for `false` **e** não estiver em `/publicidade` (caso atual da rota normal `/`). Como o componente só monta quando `visible` vira `true`, o embaralhamento da ordem (Fisher-Yates) e o início do rodízio acontecem nesse momento, não antes.
+**Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`, aqui com `p-0 pb-3` para o carrossel ocupar a largura inteira até a borda), sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
 
-Os eventos `abrir_whatsapp`/`abrir_email` (seção 12) continuam disparados a partir dos cliques nos botões do `AdBanner`, mas **somente no estado "vaga disponível"** — cliques em anunciantes reais não emitem esses eventos (não há, por enquanto, evento de Analytics dedicado a cliques em anúncios reais; avaliar se fizer sentido quando houver anunciantes cadastrados).
+**Navegação via Bootstrap Carousel**: a marcação usa `.carousel`/`.carousel-inner`/`.carousel-item`/`.carousel-indicators`/`.carousel-control-prev`/`.carousel-control-next` padrão do Bootstrap 5, com `id="ad-carousel"`. Os indicadores foram restilizados via CSS para serem pontinhos redondos pequenos (não a barra retangular padrão do Bootstrap) posicionados **abaixo** do carrossel (`position: static`, não sobrepostos); as setas ficam restritas à altura do bloco de foto (120px), para não cobrir o botão de CTA. Arrastar o dedo em telas de toque é suportado nativamente pelo Bootstrap (`touch: true`, sem lógica de touch manual).
+
+A instância JS (`new Carousel(el, { interval: 7000, ride: 'carousel', pause: 'hover', touch: true, wrap: true })`) é criada/destruída via um `watch(() => props.visible, ...)` em vez de `onMounted`/`onUnmounted` simples — necessário porque o `v-if="visible"` fica **dentro** do próprio template do `AdBanner` (mesmo padrão de `AvailableNumbers`/`UnpaidNumbers`/`DrawHistory`, seção 24), então o componente Vue monta uma vez só (na carga da página) e o elemento do carrossel só existe no DOM quando `visible` fica `true` depois. Usar `onMounted` puro tentaria instanciar o Carousel antes de o elemento existir (bug real encontrado e corrigido durante esta revisão: a rotação automática simplesmente não iniciava). Isso também corrige a documentação: o embaralhamento da lista de anunciantes (Fisher-Yates) acontece no `setup()` do componente — ou seja, **uma vez por carregamento de página**, não a cada vez que `visible` fica `true` (a instância do componente não é recriada quando `numerosDisponiveis` some e volta).
+
+`import 'bootstrap'` em `main.js` e `import { Carousel } from 'bootstrap'` em `AdBanner.vue` usam a mesma build ESM do Bootstrap (ver seção 6) — importante manter assim para não duplicar o bundle.
+
+**Condição de visibilidade**: o `AdBanner` — seja mostrando um anunciante real, seja mostrando o card de "vaga disponível" — só aparece quando `numerosDisponiveis.length > 0` **e** (`config.exibirAd` é `true` **ou** está em modo demo — ver abaixo). `App.vue` passa `:visible="numerosDisponiveis.length > 0 && (modoDemo || config.exibirAd)"` para o componente, que envolve o card inteiro em `v-if="visible"`. Ou seja: mesmo com anunciantes cadastrados e ativos, o bloco só aparece depois de uma busca de "disponíveis" bem-sucedida, e nunca aparece se `config.exibirAd` for `false` **e** não estiver em `/publicidade` (caso atual da rota normal `/`).
 
 ## Rota de demonstração `/publicidade`
 

@@ -10,9 +10,7 @@
             :visible="numerosDisponiveis.length > 0 && (modoDemo || config.exibirAd)"
             :modoDemo="modoDemo"
             :whatsappLink="linkWhats"
-            :emailLink="linkEmail"
             @contactWhatsapp="registrarEvento('abrir_whatsapp', { event_category: 'Anúncio', event_label: 'Clique em WhatsApp' })"
-            @contactEmail="registrarEvento('abrir_email', { event_category: 'Anúncio', event_label: 'Clique em E-mail' })"
         />
 
         <AvailableNumbers
@@ -90,10 +88,6 @@ const {
 
 const linkWhats = computed(() => {
     return `https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(config.emailBody)}`
-})
-
-const linkEmail = computed(() => {
-    return `mailto:${config.emailAddress}?subject=${encodeURIComponent(config.emailSubject)}&body=${encodeURIComponent(config.emailBody)}`
 })
 </script>
 

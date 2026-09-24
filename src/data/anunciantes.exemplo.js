@@ -5,8 +5,6 @@ function svgParaDataUri(svg) {
     return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
-const thumbProdutoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" rx="8" fill="#198754"/><text x="40" y="45" font-family="Arial, sans-serif" font-size="16" fill="#ffffff" text-anchor="middle">Produto</text></svg>`
-
 const bannerImagemSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200"><rect width="800" height="200" fill="#4A68F2"/><text x="400" y="112" font-family="Arial, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle">Exemplo de banner do anunciante</text></svg>`
 
 export const anunciantesExemplo = [
@@ -15,7 +13,8 @@ export const anunciantesExemplo = [
         nome: 'Loja Exemplo',
         descricao: 'Produtos e serviços da região, com atendimento local.',
         icone: 'bi-shop',
-        imagemMiniatura: '',
+        cor: '#0F6E56',
+        foto: '',
         categoria: 'empresa',
         destaque: '',
         tipo: 'card',
@@ -27,9 +26,10 @@ export const anunciantesExemplo = [
     {
         id: 'exemplo-produto',
         nome: 'Kit Exemplo',
-        descricao: 'Produto ilustrativo, com miniatura própria no lugar do ícone padrão.',
+        descricao: 'Produto ilustrativo para teste visual do carrossel, com cor de marca própria.',
         icone: 'bi-box-seam',
-        imagemMiniatura: svgParaDataUri(thumbProdutoSvg),
+        cor: '#0D6EFD',
+        foto: '',
         categoria: 'produto',
         destaque: 'Promoção por tempo limitado',
         tipo: 'card',
@@ -43,7 +43,8 @@ export const anunciantesExemplo = [
         nome: 'Serviço Exemplo',
         descricao: 'Prestação de serviço ilustrativa para teste visual do carrossel.',
         icone: 'bi-tools',
-        imagemMiniatura: '',
+        cor: '#C1440E',
+        foto: '',
         categoria: 'servico',
         destaque: '',
         tipo: 'card',
@@ -57,7 +58,8 @@ export const anunciantesExemplo = [
         nome: 'Banner Exemplo',
         descricao: '',
         icone: '',
-        imagemMiniatura: '',
+        cor: '',
+        foto: '',
         categoria: '',
         destaque: '',
         tipo: 'imagem',
