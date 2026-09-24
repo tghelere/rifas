@@ -1,15 +1,8 @@
 // Dados ilustrativos para testar visualmente os formatos do AdBanner (não usado em produção).
 // Mesma forma de item que `anunciantes.js` — ver comentário lá.
 //
-// Em dados reais, `foto` e `imagemUrl` devem apontar para caminhos dentro de
-// `public/anunciantes/` (ex: '/anunciantes/ocelos-pesca.jpg'), nunca URLs externas.
-// Aqui usamos SVGs embutidos como data URI só para não depender de arquivos externos neste exemplo.
-
-function svgParaDataUri(svg) {
-    return `data:image/svg+xml,${encodeURIComponent(svg)}`
-}
-
-const bannerImagemSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200"><rect width="800" height="200" fill="#4A68F2"/><text x="400" y="112" font-family="Arial, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle">Exemplo de banner do anunciante</text></svg>`
+// `foto` e `imagemUrl` apontam para arquivos reais em `public/anunciantes/`
+// (exemplo-1.jpg a exemplo-4.jpg), como em dados de produção — nunca URLs externas.
 
 export const anunciantesExemplo = [
     {
@@ -18,7 +11,7 @@ export const anunciantesExemplo = [
         descricao: 'Produtos e serviços da região, com atendimento local.',
         icone: 'bi-shop',
         cor: '#0F6E56',
-        foto: '',
+        foto: '/anunciantes/exemplo-1.jpg',
         categoria: 'empresa',
         destaque: '',
         tipo: 'card',
@@ -33,7 +26,7 @@ export const anunciantesExemplo = [
         descricao: 'Produto ilustrativo para teste visual do carrossel, com cor de marca própria.',
         icone: 'bi-box-seam',
         cor: '#0D6EFD',
-        foto: '',
+        foto: '/anunciantes/exemplo-2.jpg',
         categoria: 'produto',
         destaque: 'Promoção por tempo limitado',
         tipo: 'card',
@@ -48,7 +41,7 @@ export const anunciantesExemplo = [
         descricao: 'Prestação de serviço ilustrativa para teste visual do carrossel.',
         icone: 'bi-tools',
         cor: '#C1440E',
-        foto: '',
+        foto: '/anunciantes/exemplo-3.jpg',
         categoria: 'servico',
         destaque: '',
         tipo: 'card',
@@ -62,13 +55,15 @@ export const anunciantesExemplo = [
         nome: 'Banner Exemplo',
         descricao: '',
         icone: '',
-        cor: '',
+        cor: '#0E7C7B',
         foto: '',
         categoria: '',
         destaque: '',
         tipo: 'imagem',
-        imagemUrl: svgParaDataUri(bannerImagemSvg),
-        whatsapp: '',
+        imagemUrl: '/anunciantes/exemplo-4.jpg',
+        titulo: 'Sua próxima pescaria começa aqui',
+        subtitulo: 'Roteiros guiados de pesca esportiva',
+        whatsapp: '5511999990004',
         site: 'https://www.softhing.com.br',
         ativo: true
     }
