@@ -1,6 +1,8 @@
 // Dados ilustrativos para testar visualmente os formatos do AdBanner (não usado em produção).
 // Mesma forma de item que `anunciantes.js` — ver comentário lá (inclui os campos opcionais
 // `posicaoX`/`posicaoY`/`zoom` de enquadramento, ajustados abaixo observando cada foto real).
+// Todo registro abaixo declara exatamente o mesmo conjunto de chaves, na mesma ordem, mesmo
+// quando o valor é o neutro/padrão para aquele tipo (regra documentada em anunciantes.js).
 //
 // `imagem` aponta para arquivos reais em `public/anunciantes/`, como em dados de produção —
 // nunca URLs externas. `whatsapp` usa um número claramente fictício (DDD "00" não existe no
@@ -13,11 +15,12 @@ export const anunciantesExemplo = [
         descricao: 'Produtos e serviços da região, com atendimento local.',
         cor: '#0F6E56',
         imagem: '/anunciantes/exemplo-6.jpg',
-        posicaoY: 0,
-        zoom: 0,
         categoria: 'empresa',
         destaque: '',
         tipo: 'card',
+        posicaoX: 0,
+        posicaoY: 0,
+        zoom: 0,
         whatsapp: '5500000000000',
         site: 'https://www.softhing.com.br?utm_source=sortrifas&utm_medium=demo&utm_campaign=pagina_anunciantes',
         ativo: true
@@ -28,11 +31,12 @@ export const anunciantesExemplo = [
         descricao: 'Produto ilustrativo para teste visual do carrossel, com cor de marca própria.',
         cor: '#994a00',
         imagem: '/anunciantes/exemplo-4.jpg',
-        posicaoY: -50,
-        zoom: 0,
         categoria: 'produto',
         destaque: 'Promoção por tempo limitado',
         tipo: 'card',
+        posicaoX: -35,
+        posicaoY: -50,
+        zoom: 0,
         whatsapp: '5500000000000',
         site: '',
         ativo: true
@@ -43,10 +47,12 @@ export const anunciantesExemplo = [
         descricao: 'Roteiros guiados de pesca esportiva',
         cor: '#00831c',
         imagem: '/anunciantes/exemplo-1.jpg',
+        categoria: 'produto',
+        destaque: '',
+        tipo: 'imagem',
+        posicaoX: 0,
         posicaoY: 50,
         zoom: 0,
-        categoria: 'produto',
-        tipo: 'imagem',
         whatsapp: '5500000000000',
         site: '',
         ativo: true
@@ -57,11 +63,12 @@ export const anunciantesExemplo = [
         descricao: 'Prestação de serviço ilustrativa para teste visual do carrossel.',
         cor: '#C1440E',
         imagem: '/anunciantes/exemplo-7.jpg',
-        posicaoY: 50,
-        zoom: 0,
         categoria: 'servico',
         destaque: '',
         tipo: 'card',
+        posicaoX: 30,
+        posicaoY: 50,
+        zoom: 0,
         whatsapp: '',
         site: 'https://www.softhing.com.br?utm_source=sortrifas&utm_medium=demo&utm_campaign=pagina_anunciantes',
         ativo: true
@@ -72,9 +79,12 @@ export const anunciantesExemplo = [
         descricao: 'Roteiros guiados de pesca esportiva',
         cor: '#ddbc00',
         imagem: '/anunciantes/exemplo-5.jpg',
+        categoria: '',
+        destaque: '',
+        tipo: 'imagem',
+        posicaoX: 0,
         posicaoY: 10,
         zoom: 10,
-        tipo: 'imagem',
         whatsapp: '5500000000000',
         site: 'https://www.softhing.com.br?utm_source=sortrifas&utm_medium=demo&utm_campaign=pagina_anunciantes',
         ativo: true
@@ -85,9 +95,12 @@ export const anunciantesExemplo = [
         descricao: 'Roteiros guiados de pesca esportiva',
         cor: '#ddbc00',
         imagem: '/anunciantes/exemplo-4.jpg',
+        categoria: '',
+        destaque: '',
+        tipo: 'imagem',
+        posicaoX: 0,
         posicaoY: -50,
         zoom: 0,
-        tipo: 'imagem',
         whatsapp: '',
         site: 'https://www.softhing.com.br?utm_source=sortrifas&utm_medium=demo&utm_campaign=pagina_anunciantes',
         ativo: true

@@ -1,4 +1,7 @@
-// cada item de `anunciantes`:
+// cada item de `anunciantes`: todo registro deve declarar todas as chaves abaixo, na mesma
+// ordem, usando valor neutro (`''` para `categoria`/`destaque`, `0` para `posicaoX`/
+// `posicaoY`/`zoom`) quando o campo não se aplica ao tipo ou está no padrão — nunca omitir
+// uma chave que exista em outro registro.
 // {
 //   id,         // string, identificador único do anunciante
 //   nome,       // string. Tipo 'card': sempre exibido. Tipo 'imagem': sobreposto na imagem
@@ -13,27 +16,27 @@
 //   imagem,     // caminho dentro de public/anunciantes/ (ex: '/anunciantes/loja.jpg'),
 //               //   nunca URL externa. Tipo 'card': opcional (sem ela, usa `cor` sólida,
 //               //   sem ícone). Tipo 'imagem': obrigatória, cobre o bloco inteiro.
-//   categoria,  // opcional; 'empresa' | 'produto' | 'servico' — só organizacional, não
-//               //   afeta renderização em nenhum tipo.
-//   destaque,   // opcional (string). Só lido no tipo 'card' (linha de destaque abaixo da
-//               //   descrição). Não tem efeito no tipo 'imagem' — não incluir nesse caso.
+//   categoria,  // 'empresa' | 'produto' | 'servico', ou '' quando não categorizado — só
+//               //   organizacional, não afeta renderização em nenhum tipo.
+//   destaque,   // string, ou '' quando não aplicável. Só lido no tipo 'card' (linha de
+//               //   destaque abaixo da descrição). Sem efeito no tipo 'imagem' — usar ''.
 //   tipo,       // 'card' ou 'imagem' (default 'card')
-//   posicaoX,   // opcional (número, padrão 0). Desloca o enquadramento horizontal de
+//   posicaoX,   // número, 0 quando no padrão. Desloca o enquadramento horizontal de
 //               //   `imagem`: 0 = centralizado, negativo = mostra mais a ESQUERDA,
 //               //   positivo = mostra mais a DIREITA. Convertido internamente para
 //               //   background-position em % via `50 + posicaoX` (limitado a 0-100).
-//   posicaoY,   // opcional (número, padrão 0). Mesma lógica de `posicaoX`, no eixo
+//   posicaoY,   // número, 0 quando no padrão. Mesma lógica de `posicaoX`, no eixo
 //               //   vertical: negativo = mostra mais a parte de CIMA da imagem,
 //               //   positivo = mostra mais a parte de BAIXO. `50 + posicaoY` (0-100).
-//   zoom,       // opcional (número >= 0, padrão 0). 0 = sem zoom adicional (só o
-//               //   preenchimento mínimo de cover). Não aceita valores negativos (abaixo
-//               //   do cover mínimo deixaria espaço em branco, o que nunca é permitido).
-//               //   Escala aplicada = 1 + (zoom / 100), ampliando em torno do ponto
-//               //   definido por `posicaoX`/`posicaoY`.
-//   whatsapp,   // opcional (string, só dígitos, com DDI). Presente em ambos os tipos →
-//               //   mostra o botão "WhatsApp" (link https://wa.me/<whatsapp>).
-//   site,       // opcional (string, URL completa). Presente em ambos os tipos → mostra o
-//               //   botão "Visitar site".
+//   zoom,       // número >= 0, 0 quando sem zoom adicional (só o preenchimento mínimo de
+//               //   cover). Não aceita valores negativos (abaixo do cover mínimo deixaria
+//               //   espaço em branco, o que nunca é permitido). Escala aplicada =
+//               //   1 + (zoom / 100), ampliando em torno do ponto definido por
+//               //   `posicaoX`/`posicaoY`.
+//   whatsapp,   // opcional (string, só dígitos, com DDI, ou '' quando não usado). Presente
+//               //   em ambos os tipos → mostra o botão "WhatsApp" (link https://wa.me/<whatsapp>).
+//   site,       // opcional (string, URL completa, ou '' quando não usado). Presente em
+//               //   ambos os tipos → mostra o botão "Visitar site".
 //   ativo       // boolean. Só anunciantes com ativo === true entram no carrossel.
 // }
 //

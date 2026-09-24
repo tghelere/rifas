@@ -42,7 +42,6 @@
                             <template v-else>
                                 <div class="slide-photo" :style="{ backgroundColor: slide.cor || COR_PADRAO }">
                                     <div v-if="slide.imagem" class="slide-photo-img" :style="imagemEstiloFundo(slide)"></div>
-                                    <div v-if="slide.imagem" class="slide-photo-gradient" :style="gradienteStyle(slide)"></div>
                                     <span class="ad-label">Publicidade</span>
                                     <i v-if="slide.isVaga" :class="['bi', slide.icone, 'slide-photo-icon']"></i>
                                 </div>
@@ -213,11 +212,6 @@ function imagemEstiloFundo(slide) {
     return estiloEnquadramento(slide.imagem, slide.posicaoX, slide.posicaoY, slide.zoom)
 }
 
-function gradienteStyle(slide) {
-    const cor = slide.cor || COR_PADRAO
-    return { background: `linear-gradient(to right, ${cor} 0%, transparent 25%, transparent 75%, ${cor} 100%)` }
-}
-
 function ctaStyle(slide) {
     const cor = slide.cor || COR_PADRAO
     return { backgroundColor: cor, borderColor: cor, color: corTextoContraste(cor) }
@@ -367,11 +361,12 @@ function onPointerCancel() {
 .slide-photo-img {
     position: absolute;
     inset: 0;
-}
-
-.slide-photo-gradient {
-    position: absolute;
-    inset: 0;
+    mask-image: linear-gradient(to right, transparent 0%, black 25%, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%, black 75%, transparent 100%);
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
 }
 
 .slide-photo-icon {
@@ -435,6 +430,7 @@ function onPointerCancel() {
 
 .descricao-clamp {
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
