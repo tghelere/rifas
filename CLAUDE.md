@@ -665,21 +665,11 @@ for (let i = 0; i < quantidadeGerar.value && copia.length; i++) {
 const grupo = resultado.sort((a, b) => a - b)
 ```
 
-## Importante: possível regra de negócio (ainda não confirmada)
+## Regra de negócio confirmada
 
-`copia` é recriada a partir de `numerosDisponiveis.value` a cada novo sorteio, e `numerosDisponiveis` **não é atualizado** depois de um sorteio. Portanto, um número já sorteado pode aparecer novamente em um sorteio posterior dentro da mesma sessão.
+`copia` é recriada a partir de `numerosDisponiveis.value` a cada novo sorteio, e `numerosDisponiveis` **não é atualizado** depois de um sorteio. Portanto, um número já sorteado **pode aparecer novamente** em um sorteio posterior dentro da mesma sessão. **Esse comportamento é intencional.**
 
-Não assumir automaticamente que isso é bug. É necessário confirmar qual deve ser a regra antes de mudar o comportamento:
-
-### Possibilidade A
-
-Um número sorteado deixa de estar disponível e nunca mais pode ser sorteado.
-
-### Possibilidade B
-
-Cada sorteio é independente e os mesmos números podem aparecer novamente.
-
-A interface sugere que "números disponíveis" poderiam ser consumidos, mas isso deve ser confirmado antes de mudar o comportamento.
+**Por quê?** O sorteio é uma sugestão aleatória para o usuário — uma forma de ajudar a escolher quais números apresentar/oferecer aos compradores, tipicamente via grupo de WhatsApp ou presencialmente. A transação real (compra, reserva, pagamento) acontece fora da aplicação. A única fonte de verdade sobre qual número foi vendido e pago é o texto colado pelo usuário, atualizado manualmente com os símbolos 💰/💸. Logo, um número só deixa de estar "disponível" quando o usuário o marca como vendido/pago no texto — não quando aparece num sorteio.
 
 ---
 
