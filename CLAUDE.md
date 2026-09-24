@@ -1165,7 +1165,7 @@ deve funcionar sem erros.
 
 # 40. Vercel
 
-Vercel é uma opção considerada para hospedagem.
+Vercel é a plataforma escolhida para hospedagem.
 
 Razões:
 
@@ -1177,6 +1177,32 @@ Razões:
 - simplicidade operacional.
 
 Antes de tomar decisões sobre planos, preços ou limites, verificar a documentação/preços atuais.
+
+## Configuração no projeto
+
+Existe um `vercel.json` mínimo na raiz do projeto:
+
+```json
+{
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist"
+}
+```
+
+A Vercel já detecta projetos Vite automaticamente (inclusive `outputDirectory: "dist"`, que é o padrão do Vite), mas o arquivo deixa a configuração explícita e documentada em vez de depender só da detecção automática. Não é necessário nenhum rewrite/roteamento adicional: a aplicação é uma SPA de página única, sem Vue Router (seção 61), então não há rotas de cliente para redirecionar.
+
+## O que falta configurar no painel da Vercel (fora do código)
+
+Estes passos são feitos pelo usuário diretamente no painel da Vercel, não pelo código do projeto:
+
+1. **Conectar o repositório**: importar o repositório Git do projeto em vercel.com/new.
+2. **Variáveis de ambiente de produção** (Project Settings → Environment Variables), necessárias por causa da seção 16:
+   - `VITE_WHATSAPP_NUMBER`
+   - `VITE_EMAIL_ADDRESS`
+3. **Domínio próprio**: em Project Settings → Domains, adicionar `sortrifas.com.br` e apontar o DNS conforme instruído pela Vercel (registro A ou CNAME, dependendo se é domínio raiz ou subdomínio).
+4. Confirmar que o build (`npm run build`) roda sem erros no ambiente da Vercel (mesmo comando já validado localmente).
+
+Nenhum desses passos é feito via `vercel.json` ou outro arquivo do repositório — são configurações do painel, específicas da conta/projeto na Vercel.
 
 ---
 
