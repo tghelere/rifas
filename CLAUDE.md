@@ -1034,15 +1034,13 @@ Não substituir o logo existente sem solicitação.
 
 # 34. Footer
 
-Footer atual (`AppFooter.vue`):
+Footer atual (`AppFooter.vue`): texto "Desenvolvido por" seguido da logo da Softhing (`public/softhing-fundo-escuro.svg`, versão para fundo escuro — o nome "Softhing" já está desenhado na logo, por isso não há texto duplicado do nome da marca).
 
-```text
-Developed by TGhelere
-```
+A logo linka para `https://www.softhing.com.br/`, com `target="_blank"` e `rel="noopener"`.
 
-Com link para o LinkedIn do desenvolvedor (`target="_blank"`).
+**Mudou** em relação a versões anteriores ("Developed by TGhelere" com link para o LinkedIn pessoal do desenvolvedor) — a atribuição pessoal foi substituída pela marca Softhing. Não reverter para a atribuição pessoal sem solicitação.
 
-**Mudou** em relação a uma versão anterior ("Developed with ❤️ by TGhelere for you") — o texto foi simplificado, sem o emoji de coração e sem "for you". Não reverter para o texto antigo sem solicitação.
+Existe também `public/softhing-fundo-claro.svg` (versão da logo para fundo claro, com o texto em azul-marinho escuro `#1D1B51` em vez de branco), não utilizada atualmente — mantida em `public/` para uso futuro em contexto de fundo claro.
 
 ---
 

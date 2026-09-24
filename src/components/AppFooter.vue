@@ -2,8 +2,10 @@
     <footer class="mt-auto py-2">
         <div class="container text-center text-light italic">
             <small>
-                Developed by
-                <a href="https://www.linkedin.com/in/ghelere/" title="Desenvolvedor Thyago Ghelere - LinkedIn" target="_blank">TGhelere</a>
+                Desenvolvido por
+                <a href="https://www.softhing.com.br/" title="Softhing" target="_blank" rel="noopener">
+                    <img src="/softhing-fundo-escuro.svg" alt="Softhing" class="softhing-logo">
+                </a>
             </small>
         </div>
     </footer>
@@ -13,5 +15,11 @@
 footer {
     background-color: #000000ad;
     font-size: 0.9em;
+}
+
+.softhing-logo {
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 </style>
