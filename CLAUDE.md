@@ -634,9 +634,31 @@ Existe também `src/data/anunciantes.exemplo.js`, exportando `anunciantesExemplo
 
 **Card**: usa as mesmas classes dos componentes irmãos (`card border-1 mb-3` + `card-body`), ocupando a largura inteira do container, sem largura máxima customizada — igual a `TextInput`/`AvailableNumbers`/etc.
 
-**Condição de visibilidade (preservada da versão anterior ao carrossel)**: o `AdBanner` — seja mostrando um anunciante real, seja mostrando o card de "vaga disponível" — só aparece quando `numerosDisponiveis.length > 0` **e** `config.exibirAd` é `true`, exatamente como antes da reescrita. `App.vue` passa `:visible="numerosDisponiveis.length > 0 && config.exibirAd"` para o componente, que envolve o card inteiro em `v-if="visible"`. Ou seja: mesmo com anunciantes cadastrados e ativos, o bloco só aparece depois de uma busca de "disponíveis" bem-sucedida, e nunca aparece se `config.exibirAd` for `false` (caso atual). Como o componente só monta quando `visible` vira `true`, o embaralhamento da ordem (Fisher-Yates) e o início do rodízio acontecem nesse momento, não antes.
+**Condição de visibilidade (preservada da versão anterior ao carrossel)**: o `AdBanner` — seja mostrando um anunciante real, seja mostrando o card de "vaga disponível" — só aparece quando `numerosDisponiveis.length > 0` **e** (`config.exibirAd` é `true` **ou** está em modo demo — ver abaixo), exatamente como antes da reescrita, exceto pela exceção do modo demo. `App.vue` passa `:visible="numerosDisponiveis.length > 0 && (modoDemo || config.exibirAd)"` para o componente, que envolve o card inteiro em `v-if="visible"`. Ou seja: mesmo com anunciantes cadastrados e ativos, o bloco só aparece depois de uma busca de "disponíveis" bem-sucedida, e nunca aparece se `config.exibirAd` for `false` **e** não estiver em `/publicidade` (caso atual da rota normal `/`). Como o componente só monta quando `visible` vira `true`, o embaralhamento da ordem (Fisher-Yates) e o início do rodízio acontecem nesse momento, não antes.
 
 Os eventos `abrir_whatsapp`/`abrir_email` (seção 12) continuam disparados a partir dos cliques nos botões do `AdBanner`, mas **somente no estado "vaga disponível"** — cliques em anunciantes reais não emitem esses eventos (não há, por enquanto, evento de Analytics dedicado a cliques em anúncios reais; avaliar se fizer sentido quando houver anunciantes cadastrados).
+
+## Rota de demonstração `/publicidade`
+
+Existe uma rota estática para demonstrar o `AdBanner` a clientes em potencial, mostrando como o anúncio deles apareceria dentro do fluxo real da ferramenta.
+
+**Não há roteador** (nem Vue Router nem outra biblioteca, seção 61) — a detecção é um computed simples em `useRifaLogic.js`:
+
+```js
+const modoDemo = computed(() => window.location.pathname === '/publicidade')
+```
+
+Exposto pelo composable e usado em `App.vue` (passado como prop `modoDemo` para o `AdBanner`).
+
+**Comportamento quando `modoDemo` é verdadeiro** (ou seja, em `/publicidade`):
+
+- `AdBanner.vue` usa `anunciantesExemplo` (`src/data/anunciantes.exemplo.js`) no lugar de `anunciantes` — os 4 anúncios ilustrativos, não os reais.
+- `config.exibirAd` é ignorado (o bloco pode aparecer mesmo com `exibirAd: false`, caso atual).
+- A exigência de `numerosDisponiveis.length > 0` **continua valendo** — o anúncio de exemplo só aparece depois de uma busca de "disponíveis" bem-sucedida, igual ao comportamento real. `/publicidade` sozinho, sem buscar, não mostra nada.
+
+**Fora de `/publicidade`** (ou seja, na rota normal `/`), tudo continua exatamente como descrito acima — `anunciantes.js` (hoje vazio) e `config.exibirAd` (hoje `false`) valendo normalmente.
+
+Como não há roteador, abrir `/publicidade` diretamente pela URL (sem navegar pelo app) depende do rewrite de SPA no `vercel.json` (seção 40) para não dar 404 em produção — em dev, o Vite já serve `index.html` para qualquer caminho por padrão.
 
 ---
 
@@ -1217,11 +1239,14 @@ Existe um `vercel.json` mínimo na raiz do projeto:
 ```json
 {
     "buildCommand": "npm run build",
-    "outputDirectory": "dist"
+    "outputDirectory": "dist",
+    "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 
-A Vercel já detecta projetos Vite automaticamente (inclusive `outputDirectory: "dist"`, que é o padrão do Vite), mas o arquivo deixa a configuração explícita e documentada em vez de depender só da detecção automática. Não é necessário nenhum rewrite/roteamento adicional: a aplicação é uma SPA de página única, sem Vue Router (seção 61), então não há rotas de cliente para redirecionar.
+A Vercel já detecta projetos Vite automaticamente (inclusive `outputDirectory: "dist"`, que é o padrão do Vite), mas o arquivo deixa a configuração explícita e documentada em vez de depender só da detecção automática.
+
+O `rewrites` é o fallback padrão de SPA: qualquer caminho que não corresponda a um arquivo estático cai em `/index.html`. Ainda não há Vue Router (seção 61) nem rotas de verdade — mas existe a rota estática `/publicidade` (seção 16, checada via `window.location.pathname`, não por um roteador), e sem esse rewrite, abrir `sortrifas.com.br/publicidade` direto no navegador (sem navegar pelo app) resultaria em 404 na Vercel.
 
 ## O que falta configurar no painel da Vercel (fora do código)
 

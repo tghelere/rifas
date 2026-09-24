@@ -62,11 +62,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { anunciantes } from '../data/anunciantes.js'
+import { anunciantesExemplo } from '../data/anunciantes.exemplo.js'
 
 const ROTATION_INTERVAL = 7000
 
 const props = defineProps({
     visible: Boolean,
+    modoDemo: Boolean,
     whatsappLink: String,
     emailLink: String
 })
@@ -82,7 +84,8 @@ function embaralhar(array) {
     return resultado
 }
 
-const anunciantesAtivos = embaralhar(anunciantes.filter((a) => a.ativo))
+const listaAnunciantes = props.modoDemo ? anunciantesExemplo : anunciantes
+const anunciantesAtivos = embaralhar(listaAnunciantes.filter((a) => a.ativo))
 const isVagaDisponivel = anunciantesAtivos.length === 0
 
 const slides = isVagaDisponivel

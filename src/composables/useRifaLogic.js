@@ -37,6 +37,8 @@ export function useRifaLogic() {
         return Object.keys(numerosNaoPagosAgrupados.value).length
     })
 
+    const modoDemo = computed(() => window.location.pathname === '/publicidade')
+
     // Funções auxiliares
     function registrarEvento(nomeEvento, dados = {}) {
         try {
@@ -400,6 +402,7 @@ export function useRifaLogic() {
         erroValidacao,
         totalNaoPagos,
         totalCompradores,
+        modoDemo,
         // Funções
         executar,
         executarNaoPagos,
