@@ -40,7 +40,7 @@
                                 <a v-else class="slide-image-link" :href="slide.linkHref" target="_blank" rel="noopener" :title="slide.nome || 'Anúncio'"></a>
                             </div>
                             <template v-else>
-                                <div class="slide-photo" :style="{ backgroundColor: slide.cor || COR_PADRAO }">
+                                <div class="slide-photo" :style="slide.imagem ? {} : { backgroundColor: slide.cor || COR_PADRAO }">
                                     <div v-if="slide.imagem" class="slide-photo-img" :style="imagemEstiloFundo(slide)"></div>
                                     <span class="ad-label">Publicidade</span>
                                     <i v-if="slide.isVaga" :class="['bi', slide.icone, 'slide-photo-icon']"></i>
